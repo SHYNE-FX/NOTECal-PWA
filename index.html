@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="NOTECal">
 <meta name="application-name" content="NOTECal">
-<meta name="theme-color" content="#6366f1">
+<meta name="theme-color" content="#f0f2f8">
 <meta name="description" content="Calendar-based notes, to-dos, and tables">
 <title>NOTECal</title>
 <link rel="manifest" href="manifest.json">
@@ -87,10 +87,12 @@ a{color:inherit;text-decoration:none}
   flex-wrap:nowrap;
 }
 [data-theme=light] #header{
-  background:var(--accent);
-  border-bottom:1px solid transparent;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
 }
-div.logo{display:flex;align-items:center;gap:6px;flex-shrink:0;color:#fff}
+div.logo{display:flex;align-items:center;gap:6px;flex-shrink:0;color:var(--accent)}
+[data-theme=light] div.logo{color:var(--accent)}
+[data-theme=dark] div.logo{color:#fff}
 nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .logo-scroll{font-size:20px;flex-shrink:0;transform:translate(2px,2px)}
 #logo-svg{display:block;overflow:visible;flex-shrink:0;height:26px;width:auto}
@@ -204,18 +206,17 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
   backdrop-filter:blur(12px);
 }
 [data-theme=light] #bottom-nav{
-  background:var(--accent);
-  border-top:1px solid transparent;
+  background:var(--surface);
+  border-top:1px solid var(--border);
 }
 .nav-item{
   flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:3px;padding:10px 4px;min-height:var(--nav-h);
-  color:rgba(255,255,255,.55);transition:var(--tr);
+  color:var(--text3);transition:var(--tr);
   touch-action:manipulation;
 }
-[data-theme=dark] .nav-item{color:var(--text3)}
+[data-theme=light] .nav-item.active,[data-theme=light] .nav-item:active{color:var(--accent)}
 [data-theme=dark] .nav-item.active,[data-theme=dark] .nav-item:active{color:var(--accent)}
-.nav-item.active,.nav-item:active{color:#fff}
 .nav-item .ms{font-size:24px}
 .nav-item span.nav-label{font-size:10px;font-weight:600;letter-spacing:.3px}
 .nav-pill{
@@ -1126,6 +1127,10 @@ function applySettings(){
   root.setProperty('--fs',fontSize+'px');
   root.setProperty('--ui-font',`'${uiFont}',cursive`);
   root.setProperty('--item-font',`'${itemFont}',cursive`);
+
+  // Sync theme-color meta
+  const meta=document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', theme==='light'?'#f0f2f8':'#0d0f1a');
 }
 
 /* ═══════════════════════════════════════════════
