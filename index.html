@@ -3,18 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="NOTECal">
-<meta name="application-name" content="NOTECal">
-<meta name="theme-color" content="#f0f2f8">
 <meta name="description" content="Calendar-based notes, to-dos, and tables">
 <title>NOTECal</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;600;700&family=Inter:wght@300;400;500;600&family=Poppins:wght@300;400;500;600&family=Caveat:wght@400;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,700&family=Indie+Flower&family=Kalam:wght@300;400;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -484,13 +475,12 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
   background-repeat:no-repeat;background-position:right 8px center;
   max-width:130px;flex-shrink:0;
 }
-/* ── NOTE EDITOR ACTION BAR ─── */
-.ne-action-bar{
-  display:flex;align-items:center;justify-content:center;
-  gap:12px;padding:8px 16px;
-  border-top:1px solid var(--border);
-  background:var(--surface);flex-shrink:0;
-}
+/* Square action buttons in editor-topbar */
+.ne-sq{width:36px;height:36px;flex-shrink:0}
+.ne-clear-sq{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);color:#ef4444}
+.ne-clear-sq:active{background:rgba(239,68,68,.22)!important}
+.ne-save-sq{background:var(--accent);color:#fff}
+.ne-save-sq:active{opacity:.88}
 /* Folder select inline in topbar */
 .ne-folder-inline{
   width:auto;max-width:44%;min-width:90px;flex-shrink:0;
@@ -502,9 +492,6 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
   color:#fff;
   font-weight:600;
 }
-/* Save button icon-only */
-.ne-save-icon-only{padding:6px 10px;min-width:36px;justify-content:center}
-
 /* ── HBTN ─────────────────────────── */
 .btn-home{display:none}/* handled by bottom nav */
 .note-clear-btn{
@@ -552,8 +539,8 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .note-area{
   min-height:100%;width:100%;max-width:800px;margin:0 auto;
   font-family:var(--item-font);font-size:var(--fs);line-height:32px;
-  padding:28px 36px;outline:none;overflow-wrap:break-word;word-break:break-word;
-  color:#1a1a2e;
+  padding:28px 36px 28px 22px;outline:none;overflow-wrap:break-word;word-break:break-word;
+  color:#1a1a2e;text-align:justify;
 }
 .note-area ul,.note-area ol{padding-left:1.6em;margin:4px 0}
 .note-area ul{list-style:disc}
@@ -1471,6 +1458,11 @@ function openNoteEditor(id){
       <div class="editor-topbar">
         <button class="ibtn" id="ne-cancel" title="Cancel"><span class="ms">close</span></button>
         <input class="editor-title-input" id="ne-title" placeholder="Note title…" value="${note?note.title:''}">
+        <button class="ibtn ne-sq" id="ne-dup" title="Duplicate"><span class="ms">content_copy</span></button>
+        <button class="ibtn ne-sq" id="ne-dl" title="Download"><span class="ms">download</span></button>
+        ${note?`<button class="ibtn danger ne-sq" id="ne-del" title="Delete"><span class="ms">delete</span></button>`:''}
+        <button class="ibtn ne-sq ne-clear-sq" id="ne-clear" title="Clear"><span class="ms">backspace</span></button>
+        <button class="ibtn ne-sq ne-save-sq" id="ne-save" title="Save"><span class="ms">check</span></button>
         <select class="form-select ne-folder-inline" id="ne-folder">${folderSelect(note?note.folderId:S.folders[0]?.id)}</select>
       </div>
       <div class="fmt-toolbar">
@@ -1478,11 +1470,12 @@ function openNoteEditor(id){
         <button class="fmt-btn" data-cmd="italic" title="Italic"><span class="ms">format_italic</span></button>
         <button class="fmt-btn" data-cmd="underline" title="Underline"><span class="ms">format_underlined</span></button>
         <button class="fmt-btn" id="ne-highlight" title="Highlight"><span class="ms">border_color</span></button>
+        <label class="fmt-btn" title="Text Color" style="position:relative;cursor:pointer">
+          <span class="ms">format_color_text</span>
+          <input type="color" id="ne-text-color" value="#1a1a2e" style="position:absolute;width:100%;height:100%;opacity:0;cursor:pointer;top:0;left:0">
+        </label>
         <div class="fmt-sep"></div>
-        <button class="fmt-btn" data-cmd="justifyLeft" title="Align Left"><span class="ms">format_align_left</span></button>
-        <button class="fmt-btn" data-cmd="justifyCenter" title="Center"><span class="ms">format_align_center</span></button>
-        <button class="fmt-btn" data-cmd="justifyRight" title="Right"><span class="ms">format_align_right</span></button>
-        <button class="fmt-btn" data-cmd="justifyFull" title="Justify"><span class="ms">format_align_justify</span></button>
+        <button class="fmt-btn" id="ne-align-toggle" title="Alignment"><span class="ms" id="ne-align-icon">format_align_justify</span></button>
         <div class="fmt-sep"></div>
         <button class="fmt-btn" data-cmd="insertUnorderedList" title="Bullets"><span class="ms">format_list_bulleted</span></button>
         <button class="fmt-btn" data-cmd="insertOrderedList" title="Numbered"><span class="ms">format_list_numbered</span></button>
@@ -1503,13 +1496,6 @@ function openNoteEditor(id){
       <div class="note-area-wrap" id="ne-area-wrap">
         <div class="note-area note-bg-${bg}" id="ne-content" contenteditable="true" spellcheck="true">${note?note.content:''}</div>
       </div>
-      <div class="ne-action-bar">
-        <button class="ibtn" id="ne-dup" title="Duplicate"><span class="ms">content_copy</span></button>
-        <button class="ibtn" id="ne-dl" title="Download"><span class="ms">download</span></button>
-        ${note?`<button class="ibtn danger" id="ne-del" title="Delete"><span class="ms">delete</span></button>`:''}
-        <button class="note-clear-btn" id="ne-clear" title="Clear"><span class="ms" style="font-size:18px">backspace</span></button>
-        <button class="note-save-btn ne-save-icon-only" id="ne-save"><span class="ms" style="font-size:18px">check</span></button>
-      </div>
     </div>`,
   'modal modal-full');
 
@@ -1520,10 +1506,56 @@ function openNoteEditor(id){
   area.focus();
 
   document.querySelectorAll('.fmt-btn[data-cmd]').forEach(btn=>{
+    btn.addEventListener('mousedown',e=>{e.preventDefault();});
     btn.addEventListener('click',e=>{e.preventDefault();document.execCommand(btn.dataset.cmd,false,null);area.focus()});
   });
+
+  // Default align — justify
+  document.execCommand('justifyFull',false,null);
+
+  // Align dropdown
+  const alignOpts=[
+    {cmd:'justifyLeft',  icon:'format_align_left',   label:'Left'},
+    {cmd:'justifyCenter',icon:'format_align_center',  label:'Center'},
+    {cmd:'justifyRight', icon:'format_align_right',   label:'Right'},
+    {cmd:'justifyFull',  icon:'format_align_justify', label:'Justify'},
+  ];
+  const alignToggle=document.getElementById('ne-align-toggle');
+  const alignIcon=document.getElementById('ne-align-icon');
+  let alignDd=null;
+  function closeAlignDd(){if(alignDd){alignDd.remove();alignDd=null;}}
+  alignToggle.addEventListener('mousedown',e=>{e.preventDefault();});
+  alignToggle.addEventListener('click',e=>{
+    e.preventDefault();e.stopPropagation();
+    if(alignDd){closeAlignDd();return;}
+    alignDd=document.createElement('div');
+    alignDd.className='dropdown align-dd';
+    alignDd.style.cssText='min-width:140px;';
+    alignOpts.forEach(opt=>{
+      const item=document.createElement('div');
+      item.className='dropdown-item';
+      item.innerHTML=`<span class="ms" style="font-size:19px">${opt.icon}</span>${opt.label}`;
+      item.addEventListener('mousedown',e=>{e.preventDefault();});
+      item.addEventListener('click',()=>{
+        document.execCommand(opt.cmd,false,null);
+        alignIcon.textContent=opt.icon;
+        area.focus();closeAlignDd();
+      });
+      alignDd.appendChild(item);
+    });
+    const rect=alignToggle.getBoundingClientRect();
+    alignDd.style.position='fixed';
+    alignDd.style.top=(rect.bottom+4)+'px';
+    alignDd.style.left=rect.left+'px';
+    document.body.appendChild(alignDd);
+    setTimeout(()=>document.addEventListener('click',closeAlignDd,{once:true}),0);
+  });
+  document.getElementById('ne-highlight').addEventListener('mousedown',e=>{e.preventDefault();});
   document.getElementById('ne-highlight').addEventListener('click',e=>{
     e.preventDefault();document.execCommand('hiliteColor',false,'#fff176');area.focus();
+  });
+  document.getElementById('ne-text-color').addEventListener('input',e=>{
+    document.execCommand('foreColor',false,e.target.value);area.focus();
   });
   document.getElementById('ne-bg-sel').addEventListener('change',e=>{
     const bgId=e.target.value;
@@ -1572,7 +1604,20 @@ function openNoteEditor(id){
   }else{
     document.getElementById('ne-dup').addEventListener('click',()=>toast('Save first to duplicate','info'));
   }
-  document.getElementById('ne-dl').addEventListener('click',e=>{openExportMenu('note',note?.id,'download',e.currentTarget)});
+  document.getElementById('ne-dl').addEventListener('click',e=>{
+    // Sync live editor state so export reflects what user currently sees
+    const liveBg=document.getElementById('ne-bg-sel').value||'plain';
+    const liveBgColor=document.getElementById('ne-bg-color').value||'#faf8f4';
+    const liveFont=document.getElementById('ne-font-sel').value||'Comfortaa';
+    const liveContent=document.getElementById('ne-content').innerHTML;
+    const liveTitle=document.getElementById('ne-title').value.trim()||'Untitled Note';
+    if(note){
+      note.bg=liveBg;note.bgColor=liveBgColor;note.noteFont=liveFont;
+      note.content=liveContent;note.title=liveTitle;
+      if(noteCustomBg)note.customBg=noteCustomBg;
+    }
+    openExportMenu('note',note?.id,'download',e.currentTarget);
+  });
 }
 
 /* ═══════════════════════════════════════════════
@@ -2277,70 +2322,101 @@ function exportImage(type,id,mode){
   const c=getItemContent(type,id);if(!c)return;
   const note=type==='note'?S.notes.find(n=>n.id===id):null;
 
-  const PAD=40;       // outer padding of export canvas
-  const LH=32;        // line-height — must match ruled grid spacing
-  const TITLE_ROWS=2; // title occupies 2 line-height rows before content
-
+  const PAD=40;const LH=32;const W=700;const SC=2;
   const bgColor=note?.bgColor||'#faf8f4';
   const noteFont=note?.noteFont?`'${note.noteFont}',sans-serif`:'sans-serif';
   const textColor='#1a1a2e';
+  const bg=note?.bg||'plain';
 
-  // Background-position offset = PAD so first line lands at bottom of first text row
-  const bgMap={
-    plain:
-      `background-color:${bgColor};`,
-    ruled:
-      `background-color:${bgColor};`+
-      `background-image:repeating-linear-gradient(transparent,transparent 31px,#c0ccde 31px,#c0ccde 32px);`+
-      `background-size:100% ${LH}px;`+
-      `background-position:0 ${PAD}px;`,
-    square:
-      `background-color:${bgColor};`+
-      `background-image:repeating-linear-gradient(transparent,transparent 31px,#ccd4e4 31px,#ccd4e4 32px),`+
-      `repeating-linear-gradient(90deg,transparent,transparent 31px,#ccd4e4 31px,#ccd4e4 32px);`+
-      `background-size:${LH}px ${LH}px;`+
-      `background-position:${PAD}px ${PAD}px;`,
-    dotted:
-      `background-color:${bgColor};`+
-      `background-image:radial-gradient(circle,#b0bcd4 1.5px,transparent 1.5px);`+
-      `background-size:24px 24px;`+
-      `background-position:${PAD}px ${PAD}px;`,
-    custom:
-      `background-color:${bgColor};`+
-      (note?.customBg?`background-image:url(${note.customBg});background-size:cover;background-position:center;`:'')
-  };
-
-  const bgCSS=(note?bgMap[note.bg||'plain']:bgMap.plain)||bgMap.plain;
-
+  // Build content div (transparent bg — background drawn manually on canvas)
   const tmp=document.createElement('div');
-  tmp.style.cssText=
-    `position:fixed;left:-9999px;top:-9999px;`+
-    `width:700px;padding:${PAD}px;`+
-    `box-sizing:border-box;`+
-    bgCSS;
-
-  const contentHtml=type==='note'
-    ?(note?note.content:'')
-    :`<pre style="white-space:pre-wrap;margin:0">${c.text}</pre>`;
-
+  tmp.style.cssText=`position:fixed;left:-9999px;top:-9999px;width:${W}px;padding:${PAD}px;box-sizing:border-box;background:transparent;`;
+  const contentHtml=type==='note'?(note?note.content:''):`<pre style="white-space:pre-wrap;margin:0">${c.text}</pre>`;
   tmp.innerHTML=
     `<h2 style="font-size:20px;font-weight:700;color:${textColor};font-family:${noteFont};`+
-    `line-height:${LH}px;margin:0 0 ${LH}px 0;padding:0;">`+
-    `${c.title||'Untitled'}</h2>`+
-    `<div style="font-size:14px;line-height:${LH}px;color:${textColor};font-family:${noteFont};margin:0;padding:0;">`+
-    `${contentHtml}</div>`;
-
+    `line-height:${LH}px;margin:0 0 ${LH}px 0;padding:0;">${c.title||'Untitled'}</h2>`+
+    `<div style="font-size:14px;line-height:${LH}px;color:${textColor};font-family:${noteFont};margin:0;padding:0;">${contentHtml}</div>`;
   document.body.appendChild(tmp);
-  html2canvas(tmp,{scale:2,useCORS:true,logging:false,backgroundColor:null}).then(canvas=>{
-    tmp.remove();
-    canvas.toBlob(blob=>{
-      const a=document.createElement('a');
-      a.href=URL.createObjectURL(blob);
-      a.download=`${c.title||'noical'}.png`;
-      a.click();
-      toast('Downloaded as image','success');
-    });
-  }).catch(()=>{tmp.remove();toast('Image export error','error');});
+
+  function compose(bgCanvas){
+    html2canvas(tmp,{scale:SC,useCORS:true,logging:false,backgroundColor:null}).then(contentCanvas=>{
+      tmp.remove();
+      // Final canvas matches content size
+      const final=document.createElement('canvas');
+      final.width=contentCanvas.width;
+      final.height=contentCanvas.height;
+      const ctx=final.getContext('2d');
+      // Draw background
+      if(bgCanvas){
+        // tile the pattern canvas
+        const pat=ctx.createPattern(bgCanvas,'repeat');
+        ctx.fillStyle=pat;
+        ctx.fillRect(0,0,final.width,final.height);
+      }else{
+        ctx.fillStyle=bgColor;
+        ctx.fillRect(0,0,final.width,final.height);
+      }
+      // Draw sheet pattern lines via Canvas 2D
+      ctx.save();
+      if(bg==='ruled'){
+        ctx.strokeStyle='#c0ccde';ctx.lineWidth=SC;
+        for(let y=(PAD+LH)*SC;y<final.height;y+=LH*SC){
+          ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(final.width,y);ctx.stroke();
+        }
+      }else if(bg==='square'){
+        ctx.strokeStyle='#ccd4e4';ctx.lineWidth=SC;
+        for(let y=PAD*SC;y<final.height;y+=LH*SC){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(final.width,y);ctx.stroke();}
+        for(let x=PAD*SC;x<final.width;x+=LH*SC){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,final.height);ctx.stroke();}
+      }else if(bg==='dotted'){
+        ctx.fillStyle='#b0bcd4';
+        const gap=24*SC;
+        for(let y=PAD*SC;y<final.height;y+=gap){
+          for(let x=PAD*SC;x<final.width;x+=gap){
+            ctx.beginPath();ctx.arc(x,y,1.5*SC,0,Math.PI*2);ctx.fill();
+          }
+        }
+      }
+      ctx.restore();
+      // Composite text content on top
+      ctx.drawImage(contentCanvas,0,0);
+      final.toBlob(blob=>{
+        const a=document.createElement('a');
+        a.href=URL.createObjectURL(blob);
+        a.download=`${c.title||'noical'}.png`;
+        a.click();
+        toast('Downloaded as image','success');
+      });
+    }).catch(()=>{tmp.remove();toast('Image export error','error');});
+  }
+
+  // For custom bg image: load it onto an offscreen canvas first
+  if(bg==='custom'&&note?.customBg){
+    const img=new Image();
+    img.onload=()=>{
+      const bc=document.createElement('canvas');
+      bc.width=W*SC;bc.height=1; // height will be overridden — use plain fill instead
+      const bx=bc.getContext('2d');
+      // We'll just draw the image directly in compose via a flag
+      // Instead: store img reference and draw in compose
+      html2canvas(tmp,{scale:SC,useCORS:true,logging:false,backgroundColor:null}).then(contentCanvas=>{
+        tmp.remove();
+        const final=document.createElement('canvas');
+        final.width=contentCanvas.width;final.height=contentCanvas.height;
+        const ctx=final.getContext('2d');
+        ctx.drawImage(img,0,0,final.width,final.height);
+        ctx.drawImage(contentCanvas,0,0);
+        final.toBlob(blob=>{
+          const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+          a.download=`${c.title||'noical'}.png`;a.click();
+          toast('Downloaded as image','success');
+        });
+      }).catch(()=>{tmp.remove();toast('Image export error','error');});
+    };
+    img.onerror=()=>compose(null);
+    img.src=note.customBg;
+  }else{
+    compose(null);
+  }
 }
 
 /* ═══════════════════════════════════════════════
@@ -2443,14 +2519,6 @@ function init(){
 }
 init();
 </script>
-<script>
-if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./sw.js')
-      .then(r=>console.log('SW registered',r.scope))
-      .catch(e=>console.warn('SW failed',e));
-  });
-}
-</script>
+
 </body>
 </html>
