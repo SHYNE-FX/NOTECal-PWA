@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background rounded square -->
+  <rect width="512" height="512" rx="110" ry="110" fill="#000000"/>
+
+  <!-- Scroll icon (centered, ~300px, stroke style matching Image 5) -->
+  <g transform="translate(106,106) scale(12.5)" fill="none" stroke="#ffffff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Bottom tab (scroll roll) -->
+    <path d="M8 21h12a2 2 0 0 0 0-4H8v4z"/>
+    <!-- Main body -->
+    <path d="M19 17V5a2 2 0 0 0-2-2H7"/>
+    <!-- Top-left circle peg -->
+    <path d="M7 3a2 2 0 0 0 0 4h.5"/>
+    <!-- Left edge line -->
+    <path d="M7 7v10"/>
+  </g>
+</svg>
