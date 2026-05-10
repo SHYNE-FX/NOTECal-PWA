@@ -1751,6 +1751,8 @@ function openNoteEditor(id){
   fontSel.addEventListener('change',e=>{
     fontSel.style.fontFamily=`'${e.target.value}',sans-serif`;
     area.style.fontFamily=`'${e.target.value}',sans-serif`;
+    const pm=getPinMarker();
+    if(pm){const dd=pm.querySelector('div[style*="position:absolute"]');if(dd)dd.style.fontFamily=`'${e.target.value}',sans-serif`;}
   });
 
   // ── Font size select ─────────────────────────────
@@ -1774,9 +1776,25 @@ function openNoteEditor(id){
   });
 
   // ── Pin toggle ───────────────────────────────────
-  const PIN_MARKER_HTML=`<div class="note-pin-marker" contenteditable="false" data-pin="1" style="text-align:center;padding:8px 0 4px;line-height:1;user-select:none;pointer-events:none;"><svg width="50" height="50" viewBox="0 0 60 105" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.55))"><g transform="rotate(-22,30,55)"><ellipse cx="30" cy="10" rx="17" ry="5.5" fill="#e00"/><rect x="13" y="10" width="34" height="11" fill="#c00"/><ellipse cx="26" cy="8" rx="7" ry="2.5" fill="rgba(255,120,120,0.55)"/><ellipse cx="30" cy="21" rx="17" ry="5.5" fill="#a00"/><rect x="25" y="21" width="10" height="30" fill="#c00"/><rect x="27" y="21" width="5" height="30" fill="#e00"/><ellipse cx="30" cy="51" rx="15" ry="4.5" fill="#c00"/><rect x="15" y="51" width="30" height="9" fill="#dd0000"/><rect x="17" y="51" width="7" height="9" fill="#ff2222"/><ellipse cx="30" cy="60" rx="15" ry="4.5" fill="#a00"/><line x1="30" y1="60" x2="16" y2="98" stroke="#9aacba" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="60" x2="15.5" y2="98" stroke="#ccd6e0" stroke-width="1.2" stroke-linecap="round"/></g></svg></div>`;
+  function ordSuffix(d){return d+(d>=11&&d<=13?'th':d%10===1?'st':d%10===2?'nd':d%10===3?'rd':'th')}
+  function pinMarkerHTML(){
+    const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const MONS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const ref=S.selectedDate||today();
+    const [y,m,d]=ref.split('-').map(Number);
+    const dt=new Date(y,m-1,d);
+    const dayName=DAYS[dt.getDay()];
+    const monName=MONS[m-1];
+    const now=new Date();
+    let h=now.getHours(),mi=now.getMinutes(),ampm=h>=12?'PM':'AM';
+    h=h%12||12;
+    const timeStr=`${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')} ${ampm}`;
+    const dateStr=`${monName} ${ordSuffix(d)}, ${y}`;
+    const dayStr=`${dayName},`;
+    return `<div class="note-pin-marker" contenteditable="false" data-pin="1" style="position:relative;text-align:center;padding:0;margin-top:-18px;line-height:1;user-select:none;pointer-events:none;"><i class="fa-solid fa-thumbtack" style="color:rgba(224,0,0,1);font-size:28px;filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.45));"></i><div style="position:absolute;right:0;top:50%;transform:translateY(-50%);text-align:center;font-family:'${fontSel.value||curFont}',sans-serif;line-height:1.5;"><div style="font-size:11px;opacity:0.7;">${dayStr}</div><div style="font-size:13px;font-weight:700;letter-spacing:-.2px;">${dateStr}</div><div style="font-size:11px;opacity:0.7;">${timeStr}</div></div></div>`;
+  }
   function getPinMarker(){return area.querySelector('[data-pin="1"]');}
-  function insertPinMarker(){if(!getPinMarker()){area.insertAdjacentHTML('afterbegin',PIN_MARKER_HTML);}}
+  function insertPinMarker(){if(!getPinMarker()){area.insertAdjacentHTML('afterbegin',pinMarkerHTML());}}
   function removePinMarker(){const m=getPinMarker();if(m)m.remove();}
   if(curPinned)insertPinMarker();
 
@@ -2600,8 +2618,33 @@ function exportImage(type,id,mode){
   // Build content div (transparent bg — background drawn manually on canvas)
   const tmp=document.createElement('div');
   tmp.style.cssText=`position:fixed;left:-9999px;top:-9999px;width:${W}px;padding:${PAD}px;box-sizing:border-box;background:transparent;`;
-  const contentHtml=type==='note'?(note?note.content:''):`<pre style="white-space:pre-wrap;margin:0">${c.text}</pre>`;
-  const pinHtml=(note&&note.pinned)?`<div style="text-align:center;padding:8px 0 4px;line-height:1;"><svg width="50" height="50" viewBox="0 0 60 105" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.55))"><g transform="rotate(-22,30,55)"><ellipse cx="30" cy="10" rx="17" ry="5.5" fill="#e00"/><rect x="13" y="10" width="34" height="11" fill="#c00"/><ellipse cx="26" cy="8" rx="7" ry="2.5" fill="rgba(255,120,120,0.55)"/><ellipse cx="30" cy="21" rx="17" ry="5.5" fill="#a00"/><rect x="25" y="21" width="10" height="30" fill="#c00"/><rect x="27" y="21" width="5" height="30" fill="#e00"/><ellipse cx="30" cy="51" rx="15" ry="4.5" fill="#c00"/><rect x="15" y="51" width="30" height="9" fill="#dd0000"/><rect x="17" y="51" width="7" height="9" fill="#ff2222"/><ellipse cx="30" cy="60" rx="15" ry="4.5" fill="#a00"/><line x1="30" y1="60" x2="16" y2="98" stroke="#9aacba" stroke-width="3" stroke-linecap="round"/><line x1="29" y1="60" x2="15.5" y2="98" stroke="#ccd6e0" stroke-width="1.2" stroke-linecap="round"/></g></svg></div>`:'';
+  const contentHtml=(()=>{
+    if(type!=='note')return`<pre style="white-space:pre-wrap;margin:0">${c.text}</pre>`;
+    if(!note)return'';
+    const _tmp=document.createElement('div');
+    _tmp.innerHTML=note.content;
+    _tmp.querySelectorAll('[data-pin="1"]').forEach(m=>m.remove());
+    return _tmp.innerHTML;
+  })();
+  const pinHtml=(()=>{
+    if(!note||!note.pinned)return'';
+    const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const MONS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const ref=note.date||today();
+    const [y,m,d]=ref.split('-').map(Number);
+    const dt=new Date(y,m-1,d);
+    const dayStr=DAYS[dt.getDay()]+',';
+    const ord=d+(d>=11&&d<=13?'th':d%10===1?'st':d%10===2?'nd':d%10===3?'rd':'th');
+    const dateStr=`${MONS[m-1]} ${ord}, ${y}`;
+    const cr=note.createdAt?new Date(note.createdAt):new Date();
+    let h=cr.getHours(),mi=cr.getMinutes(),ampm=h>=12?'PM':'AM';
+    h=h%12||12;
+    const timeStr=`${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')} ${ampm}`;
+    const dateBlock=`<div style="text-align:center;font-family:${noteFont};line-height:1.5;white-space:nowrap;"><div style="font-size:11px;opacity:0.65;">${dayStr}</div><div style="font-size:13px;font-weight:700;letter-spacing:-.2px;">${dateStr}</div><div style="font-size:11px;opacity:0.65;">${timeStr}</div></div>`;
+    const pinSvg=`<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><path d="M16 3H8l1 5-4 3h4v9l3-3 3 3v-9h4l-4-3 1-5z" fill="rgba(224,0,0,1)" stroke="rgba(160,0,0,1)" stroke-width="0.8"/></svg>`;
+    return `<table style="width:100%;border-collapse:collapse;margin-top:-8px;margin-bottom:4px;"><tr><td style="width:50%;font-size:0;line-height:0;color:transparent;"></td><td style="text-align:center;vertical-align:middle;padding:0;">${pinSvg}</td><td style="width:50%;vertical-align:middle;padding-left:6px;">${dateBlock}</td></tr></table>`;
+  })();
+
   tmp.innerHTML=
     `<h2 style="font-size:20px;font-weight:700;color:${textColor};font-family:${noteFont};`+
     `line-height:${LH}px;margin:0 0 ${LH}px 0;padding:0;">${c.title||'Untitled'}</h2>`+
