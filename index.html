@@ -952,7 +952,7 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
 }
 
 /* ── PIN DISPLAY ──────────────── */
-.note-pin-marker{text-align:center;padding:8px 0 4px;line-height:1;user-select:none;pointer-events:none;}
+.note-pin-marker{height:32px;display:flex;align-items:center;justify-content:flex-end;padding:0;margin:0;line-height:1;user-select:none;pointer-events:none;}
 
 /* ── READING MODE ─────────────── */
 #reading-mode{
@@ -1767,7 +1767,7 @@ function openNoteEditor(id){
     const timeStr=`${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')} ${ampm}`;
     const dateStr=`${d} ${MONS[m-1]}, ${y}`;
     const dayTime=`${DAYS[dt.getDay()]}, ${timeStr}`;
-    return `<div class="note-pin-marker" contenteditable="false" data-pin="1" style="padding:2px 0 4px;margin-top:-18px;line-height:1.5;user-select:none;pointer-events:none;"><div style="text-align:right;font-family:'${fontSel.value||curFont}',sans-serif;line-height:1.5;"><div style="font-size:13px;font-weight:700;letter-spacing:-.2px;">${dateStr}</div><div style="font-size:11px;opacity:0.7;">${dayTime}</div></div></div>`;
+    return `<div class="note-pin-marker" contenteditable="false" data-pin="1" style="user-select:none;pointer-events:none;"><div style="text-align:right;font-family:'${fontSel.value||curFont}',sans-serif;line-height:1.3;"><div style="font-size:13px;font-weight:700;letter-spacing:-.2px;">${dateStr}</div><div style="font-size:11px;opacity:0.7;">${dayTime}</div></div></div>`;
   }
   function getPinMarker(){return area.querySelector('[data-pin="1"]');}
   function insertPinMarker(){if(!getPinMarker()){area.insertAdjacentHTML('afterbegin',pinMarkerHTML());}}
