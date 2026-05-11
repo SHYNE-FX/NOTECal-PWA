@@ -1572,6 +1572,7 @@ function openNoteEditor(id){
       <div class="editor-topbar">
         <button class="ibtn" id="ne-cancel" title="Cancel"><span class="ms">close</span></button>
         <input class="editor-title-input" id="ne-title" placeholder="Note title…" value="${note?note.title:''}">
+        <button class="ibtn ne-sq ne-save-sq" id="ne-read" title="Reading mode"><span class="ms">fullscreen</span></button>
         <select class="form-select ne-folder-inline" id="ne-folder">${folderSelect(note?note.folderId:S.folders[0]?.id)}</select>
         <button class="ibtn ne-sq ne-clear-sq" id="ne-clear" title="Clear"><span class="ms">backspace</span></button>
         <button class="ibtn ne-sq ne-save-sq" id="ne-save" title="Save"><span class="ms">check</span></button>
@@ -1579,7 +1580,6 @@ function openNoteEditor(id){
       <div class="fmt-toolbar">
         <button class="fmt-btn" id="ne-undo" title="Undo (Ctrl+Z)"><span class="ms">undo</span></button>
         <button class="fmt-btn" id="ne-redo" title="Redo (Ctrl+Y)"><span class="ms">redo</span></button>
-        <div class="fmt-sep"></div>
         <button class="fmt-btn" data-cmd="bold" title="Bold"><span class="ms">format_bold</span></button>
         <button class="fmt-btn" data-cmd="italic" title="Italic"><span class="ms">format_italic</span></button>
         <button class="fmt-btn" data-cmd="underline" title="Underline"><span class="ms">format_underlined</span></button>
@@ -1588,46 +1588,24 @@ function openNoteEditor(id){
           <span class="ms">format_color_text</span>
           <input type="color" id="ne-text-color" value="#1a1a2e" style="position:absolute;width:100%;height:100%;opacity:0;cursor:pointer;top:0;left:0">
         </label>
+        <button class="fmt-btn" id="ne-align-toggle" title="Alignment, Lists &amp; Pin"><span class="ms">format_align_justify</span></button>
+        <div class="fmt-sep"></div>
+        <button class="ibtn ne-sq" id="ne-dup" title="Duplicate" style="width:28px;height:28px"><span class="ms" style="font-size:16px">content_copy</span></button>
+        <button class="ibtn ne-sq" id="ne-dl" title="Download" style="width:28px;height:28px"><span class="ms" style="font-size:16px">download</span></button>
       </div>
       <div class="editor-options">
-        <label>Font</label>
         <select class="font-note-select" id="ne-font-sel">
           ${NOTE_FONTS.map(f=>`<option value="${f}" style="font-family:'${f}'" ${f===curFont?'selected':''}>${f}</option>`).join('')}
         </select>
-        <div class="fmt-sep"></div>
-        <label>Size</label>
         <select class="bg-dropdown" id="ne-font-size" style="min-width:70px">
           ${NOTE_SIZES.map(s=>`<option value="${s}" ${s===curSize?'selected':''}>${s}px</option>`).join('')}
         </select>
-      </div>
-      <div class="editor-alignbar">
-        <button class="fmt-btn ne-align-btn" data-align="justifyLeft" title="Align Left"><span class="ms">format_align_left</span></button>
-        <button class="fmt-btn ne-align-btn" data-align="justifyCenter" title="Align Center"><span class="ms">format_align_center</span></button>
-        <button class="fmt-btn ne-align-btn" data-align="justifyRight" title="Align Right"><span class="ms">format_align_right</span></button>
-        <button class="fmt-btn ne-align-btn" data-align="justifyFull" title="Justify"><span class="ms">format_align_justify</span></button>
-        <div class="fmt-sep"></div>
-        <button class="fmt-btn" data-cmd="insertUnorderedList" title="Bullets"><span class="ms">format_list_bulleted</span></button>
-        <button class="fmt-btn" data-cmd="insertOrderedList" title="Numbered"><span class="ms">format_list_numbered</span></button>
-        <div class="fmt-sep"></div>
-        <button class="fmt-btn${curPinned?' active':''}" id="ne-pin" title="Toggle pin" style="width:auto;padding:0 8px;gap:4px;font-size:12px;white-space:nowrap">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
-            <circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M12 7v10M8.5 10.5l3.5-3.5 3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          Pin
-        </button>
-      </div>
-      <div class="editor-bottombar">
-        <label style="font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap;text-transform:uppercase;letter-spacing:.4px">Sheet</label>
         <select class="bg-dropdown" id="ne-bg-sel" style="font-size:11px;padding:4px 24px 4px 8px;min-height:32px">
           ${BG_TYPES.map(b=>`<option value="${b.id}"${b.id===bg?' selected':''}>${b.label}</option>`).join('')}
         </select>
         <input type="color" id="ne-bg-color" title="Sheet color" value="${note&&note.bgColor?note.bgColor:'#faf8f4'}" style="width:28px;height:28px;border-radius:6px;border:2px solid var(--border2);cursor:pointer;padding:0;flex-shrink:0">
-        <input type="file" id="ne-bg-file" accept="image/*" style="display:none">        <button class="ibtn ne-sq" id="ne-read" title="Reading mode"><span class="ms">menu_book</span></button>
-        <button class="ibtn ne-sq" id="ne-dup" title="Duplicate"><span class="ms">content_copy</span></button>
-        <button class="ibtn ne-sq" id="ne-dl" title="Download"><span class="ms">download</span></button>
-        ${note?`<button class="ibtn danger ne-sq" id="ne-del" title="Delete"><span class="ms">delete</span></button>`:''}
-        <button class="ibtn ne-sq ne-toolbar-toggle" id="ne-toolbar-toggle" title="Toggle toolbar"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 6c3.79 0 7.17 2.13 8.82 5.5-.59 1.22-1.42 2.27-2.41 3.12l1.41 1.41c1.39-1.26 2.5-2.84 3.18-4.53C21.27 7.11 17 4 12 4c-1.27 0-2.49.2-3.64.57l1.65 1.65C10.66 6.09 11.32 6 12 6zm-1.07 1.14L13 9.21c.57.25 1.03.71 1.28 1.28l2.07 2.07c.08-.34.14-.7.14-1.07C16.5 9.01 14.48 7 12 7c-.37 0-.72.05-1.07.14zM2.01 3.87l2.68 2.68C3.06 7.83 1.77 9.53 1 11.5 2.73 15.89 7 19 12 19c1.52 0 2.98-.29 4.32-.82l3.42 3.42 1.41-1.41L3.42 2.45 2.01 3.87zm7.5 7.5l2.61 2.61c-.04.01-.08.02-.12.02-1.38 0-2.5-1.12-2.5-2.5 0-.05.01-.09.01-.13zm-3.4-3.4l1.75 1.75c-.23.55-.36 1.15-.36 1.78 0 2.48 2.02 4.5 4.5 4.5.63 0 1.23-.13 1.77-.36l.98.98c-.88.24-1.8.38-2.75.38-3.79 0-7.17-2.13-8.82-5.5.7-1.43 1.73-2.61 2.93-3.53z"/></svg></button>
+        <input type="file" id="ne-bg-file" accept="image/*" style="display:none">
+        ${note?`<button class="ibtn danger ne-sq" id="ne-del" title="Delete" style="width:28px;height:28px"><span class="ms">delete</span></button>`:''}
       </div>
       <div class="note-area-wrap" id="ne-area-wrap">
         <div class="note-area note-bg-${bg}" id="ne-content" contenteditable="true" spellcheck="true">${note?note.content:''}</div>
@@ -1778,31 +1756,23 @@ function openNoteEditor(id){
   // ── Pin toggle ───────────────────────────────────
   function ordSuffix(d){return d+(d>=11&&d<=13?'th':d%10===1?'st':d%10===2?'nd':d%10===3?'rd':'th')}
   function pinMarkerHTML(){
-    const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const MONS=['January','February','March','April','May','June','July','August','September','October','November','December'];
     const ref=S.selectedDate||today();
     const [y,m,d]=ref.split('-').map(Number);
     const dt=new Date(y,m-1,d);
-    const dayName=DAYS[dt.getDay()];
-    const monName=MONS[m-1];
     const now=new Date();
     let h=now.getHours(),mi=now.getMinutes(),ampm=h>=12?'PM':'AM';
     h=h%12||12;
     const timeStr=`${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')} ${ampm}`;
-    const dateStr=`${monName} ${ordSuffix(d)}, ${y}`;
-    const dayStr=`${dayName},`;
-    return `<div class="note-pin-marker" contenteditable="false" data-pin="1" style="position:relative;text-align:center;padding:0;margin-top:-18px;line-height:1;user-select:none;pointer-events:none;"><i class="fa-solid fa-thumbtack" style="color:rgba(224,0,0,1);font-size:28px;filter:drop-shadow(2px 4px 6px rgba(0,0,0,0.45));"></i><div style="position:absolute;right:0;top:50%;transform:translateY(-50%);text-align:center;font-family:'${fontSel.value||curFont}',sans-serif;line-height:1.5;"><div style="font-size:11px;opacity:0.7;">${dayStr}</div><div style="font-size:13px;font-weight:700;letter-spacing:-.2px;">${dateStr}</div><div style="font-size:11px;opacity:0.7;">${timeStr}</div></div></div>`;
+    const dateStr=`${d} ${MONS[m-1]}, ${y}`;
+    const dayTime=`${DAYS[dt.getDay()]}, ${timeStr}`;
+    return `<div class="note-pin-marker" contenteditable="false" data-pin="1" style="padding:2px 0 4px;margin-top:-18px;line-height:1.5;user-select:none;pointer-events:none;"><div style="text-align:right;font-family:'${fontSel.value||curFont}',sans-serif;line-height:1.5;"><div style="font-size:13px;font-weight:700;letter-spacing:-.2px;">${dateStr}</div><div style="font-size:11px;opacity:0.7;">${dayTime}</div></div></div>`;
   }
   function getPinMarker(){return area.querySelector('[data-pin="1"]');}
   function insertPinMarker(){if(!getPinMarker()){area.insertAdjacentHTML('afterbegin',pinMarkerHTML());}}
   function removePinMarker(){const m=getPinMarker();if(m)m.remove();}
   if(curPinned)insertPinMarker();
-
-  const pinBtn=document.getElementById('ne-pin');
-  pinBtn.addEventListener('click',()=>{
-    const on=pinBtn.classList.toggle('active');
-    on?insertPinMarker():removePinMarker();
-  });
 
   // ── Reading mode ─────────────────────────────────
   document.getElementById('ne-read').addEventListener('click',()=>{
@@ -1815,15 +1785,14 @@ function openNoteEditor(id){
       rm.innerHTML=`
         <div id="reading-mode-bar">
           <h3 id="rm-title">${document.getElementById('ne-title').value||'Note'}</h3>
-          <button class="read-edit-btn" id="rm-edit"><span class="ms">edit</span>Edit</button>
-          <button class="read-edit-btn" id="rm-close" style="margin-left:4px"><span class="ms">close</span></button>
+          <button class="read-edit-btn" id="rm-close"><span class="ms">close</span></button>
         </div>
         <div id="reading-mode-content">
-          <div id="reading-mode-note"></div>
+          <div id="reading-mode-note" contenteditable="true" spellcheck="true"></div>
         </div>`;
       document.body.appendChild(rm);
     }
-    // Sync content
+    // Sync editor → reading mode
     document.getElementById('rm-title').textContent=document.getElementById('ne-title').value||'Note';
     const rmNote=document.getElementById('reading-mode-note');
     rmNote.innerHTML=area.innerHTML;
@@ -1834,8 +1803,10 @@ function openNoteEditor(id){
     rmNote.style.backgroundSize=area.style.backgroundSize||'';
     rmNote.className=area.className.replace('note-area','').trim();
     rm.classList.add('open');
-    document.getElementById('rm-edit').onclick=()=>{rm.classList.remove('open');area.focus();};
-    document.getElementById('rm-close').onclick=()=>{rm.classList.remove('open');};
+    rmNote.focus();
+    // Sync reading mode → editor on close
+    function syncBack(){area.innerHTML=rmNote.innerHTML;rm.classList.remove('open');}
+    document.getElementById('rm-close').onclick=syncBack;
   }
   document.getElementById('ne-clear').addEventListener('click',()=>{
     if(confirm('Clear all note content?')){area.innerHTML='';area.focus();}
@@ -1872,21 +1843,78 @@ function openNoteEditor(id){
     document.getElementById('ne-dup').addEventListener('click',()=>toast('Save first to duplicate','info'));
   }
 
-  // ── Toolbar toggle ─────────────────────────────────────
-  const toolbarToggleBtn = document.getElementById('ne-toolbar-toggle');
-  const fmtBar = document.querySelector('.fmt-toolbar');
-  const optBar = document.querySelector('.editor-options');
-  const alignBar = document.querySelector('.editor-alignbar');
-  const SVG_VIS_OFF = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 6c3.79 0 7.17 2.13 8.82 5.5-.59 1.22-1.42 2.27-2.41 3.12l1.41 1.41c1.39-1.26 2.5-2.84 3.18-4.53C21.27 7.11 17 4 12 4c-1.27 0-2.49.2-3.64.57l1.65 1.65C10.66 6.09 11.32 6 12 6zm-1.07 1.14L13 9.21c.57.25 1.03.71 1.28 1.28l2.07 2.07c.08-.34.14-.7.14-1.07C16.5 9.01 14.48 7 12 7c-.37 0-.72.05-1.07.14zM2.01 3.87l2.68 2.68C3.06 7.83 1.77 9.53 1 11.5 2.73 15.89 7 19 12 19c1.52 0 2.98-.29 4.32-.82l3.42 3.42 1.41-1.41L3.42 2.45 2.01 3.87zm7.5 7.5l2.61 2.61c-.04.01-.08.02-.12.02-1.38 0-2.5-1.12-2.5-2.5 0-.05.01-.09.01-.13zm-3.4-3.4l1.75 1.75c-.23.55-.36 1.15-.36 1.78 0 2.48 2.02 4.5 4.5 4.5.63 0 1.23-.13 1.77-.36l.98.98c-.88.24-1.8.38-2.75.38-3.79 0-7.17-2.13-8.82-5.5.7-1.43 1.73-2.61 2.93-3.53z"/></svg>`;
-  const SVG_VIS_ON = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>`;
-  toolbarToggleBtn.addEventListener('click', () => {
-    const hidden = fmtBar.style.display === 'none';
-    fmtBar.style.display = hidden ? '' : 'none';
-    optBar.style.display = hidden ? '' : 'none';
-    alignBar.style.display = hidden ? '' : 'none';
-    toolbarToggleBtn.classList.toggle('active', !hidden);
-    toolbarToggleBtn.innerHTML = hidden ? SVG_VIS_OFF : SVG_VIS_ON;
+  // ── Align/list/pin dropdown (body-mounted to escape overflow clipping) ──────
+  const alignToggle = document.getElementById('ne-align-toggle');
+  // Build menu and mount to body
+  const alignMenu = document.createElement('div');
+  alignMenu.id = 'ne-align-menu';
+  alignMenu.style.cssText = `display:none;position:fixed;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r);box-shadow:0 8px 28px var(--shadow);padding:6px;z-index:99999;flex-direction:column;gap:2px;min-width:44px`;
+  alignMenu.innerHTML = `
+    <button class="fmt-btn ne-align-btn" data-align="justifyLeft" title="Align Left"><span class="ms">format_align_left</span></button>
+    <button class="fmt-btn ne-align-btn" data-align="justifyCenter" title="Align Center"><span class="ms">format_align_center</span></button>
+    <button class="fmt-btn ne-align-btn" data-align="justifyRight" title="Align Right"><span class="ms">format_align_right</span></button>
+    <button class="fmt-btn ne-align-btn" data-align="justifyFull" title="Justify"><span class="ms">format_align_justify</span></button>
+    <div style="width:100%;height:1px;background:var(--border2);margin:2px 0;flex-shrink:0"></div>
+    <button class="fmt-btn" data-cmd="insertUnorderedList" title="Bullets"><span class="ms">format_list_bulleted</span></button>
+    <button class="fmt-btn" data-cmd="insertOrderedList" title="Numbered"><span class="ms">format_list_numbered</span></button>
+    <div style="width:100%;height:1px;background:var(--border2);margin:2px 0;flex-shrink:0"></div>
+    <button class="fmt-btn${curPinned?' active':''}" id="ne-pin" title="Toggle pin">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M12 7v10M8.5 10.5l3.5-3.5 3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>`;
+  document.body.appendChild(alignMenu);
+
+  // ne-pin lives inside alignMenu — wire it up after mount
+  const pinBtn = document.getElementById('ne-pin');
+  pinBtn.addEventListener('click', e => {
+    e.stopPropagation(); // keep menu open
+    const on = pinBtn.classList.toggle('active');
+    on ? insertPinMarker() : removePinMarker();
   });
+
+  // Wire up buttons inside the menu
+  alignMenu.querySelectorAll('.ne-align-btn').forEach(btn=>{
+    btn.addEventListener('mousedown',e=>e.preventDefault());
+    btn.addEventListener('click',()=>{
+      document.execCommand(btn.dataset.align,false,null);
+      alignMenu.querySelectorAll('.ne-align-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      area.focus();
+    });
+  });
+  alignMenu.querySelectorAll('.fmt-btn[data-cmd]').forEach(btn=>{
+    btn.addEventListener('mousedown',e=>e.preventDefault());
+    btn.addEventListener('click',()=>{document.execCommand(btn.dataset.cmd,false,null);area.focus();});
+  });
+
+  function openAlignMenu(){
+    const r = alignToggle.getBoundingClientRect();
+    alignMenu.style.display = 'flex';
+    // Position below button, right-aligned
+    const mw = alignMenu.offsetWidth||50;
+    let left = r.right - mw;
+    if(left < 4) left = 4;
+    alignMenu.style.top = (r.bottom + 4) + 'px';
+    alignMenu.style.left = left + 'px';
+    alignToggle.classList.add('active');
+  }
+  function closeAlignMenu(){
+    alignMenu.style.display = 'none';
+    alignToggle.classList.remove('active');
+  }
+  alignToggle.addEventListener('mousedown', e => e.preventDefault());
+  alignToggle.addEventListener('click', e => {
+    e.stopPropagation();
+    alignMenu.style.display === 'flex' ? closeAlignMenu() : openAlignMenu();
+  });
+  document.addEventListener('click', e => {
+    if(!alignMenu.contains(e.target) && e.target !== alignToggle) closeAlignMenu();
+  });
+  // Clean up menu from body when modal closes
+  const _origCloseModal = window._alignMenuCleanup;
+  window._alignMenuCleanup = () => { alignMenu.remove(); };
   document.getElementById('ne-dl').addEventListener('click',e=>{
     // Sync live editor state so export reflects what user currently sees
     const liveBg=document.getElementById('ne-bg-sel').value||'plain';
@@ -2628,19 +2656,18 @@ function exportImage(type,id,mode){
   })();
   const pinHtml=(()=>{
     if(!note||!note.pinned)return'';
-    const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const DAYS=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const MONS=['January','February','March','April','May','June','July','August','September','October','November','December'];
     const ref=note.date||today();
     const [y,m,d]=ref.split('-').map(Number);
     const dt=new Date(y,m-1,d);
-    const dayStr=DAYS[dt.getDay()]+',';
-    const ord=d+(d>=11&&d<=13?'th':d%10===1?'st':d%10===2?'nd':d%10===3?'rd':'th');
-    const dateStr=`${MONS[m-1]} ${ord}, ${y}`;
+    const dateStr=`${d} ${MONS[m-1]}, ${y}`;
     const cr=note.createdAt?new Date(note.createdAt):new Date();
     let h=cr.getHours(),mi=cr.getMinutes(),ampm=h>=12?'PM':'AM';
     h=h%12||12;
     const timeStr=`${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')} ${ampm}`;
-    const dateBlock=`<div style="text-align:center;font-family:${noteFont};line-height:1.5;white-space:nowrap;"><div style="font-size:11px;opacity:0.65;">${dayStr}</div><div style="font-size:13px;font-weight:700;letter-spacing:-.2px;">${dateStr}</div><div style="font-size:11px;opacity:0.65;">${timeStr}</div></div>`;
+    const dayTime=`${DAYS[dt.getDay()]}, ${timeStr}`;
+    const dateBlock=`<div style="text-align:center;font-family:${noteFont};line-height:1.5;white-space:nowrap;"><div style="font-size:13px;font-weight:700;letter-spacing:-.2px;">${dateStr}</div><div style="font-size:11px;opacity:0.65;">${dayTime}</div></div>`;
     const pinSvg=`<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;"><path d="M16 3H8l1 5-4 3h4v9l3-3 3 3v-9h4l-4-3 1-5z" fill="rgba(224,0,0,1)" stroke="rgba(160,0,0,1)" stroke-width="0.8"/></svg>`;
     return `<table style="width:100%;border-collapse:collapse;margin-top:-8px;margin-bottom:4px;"><tr><td style="width:50%;font-size:0;line-height:0;color:transparent;"></td><td style="text-align:center;vertical-align:middle;padding:0;">${pinSvg}</td><td style="width:50%;vertical-align:middle;padding-left:6px;">${dateBlock}</td></tr></table>`;
   })();
