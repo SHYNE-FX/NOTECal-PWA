@@ -100,7 +100,7 @@ a{color:inherit;text-decoration:none}
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23ffffff'/%3E%3C/svg%3E");
 }
 [data-theme=light] #header .cal-select option{background:var(--accent);color:#fff}
-div.logo{display:flex;align-items:center;gap:6px;flex-shrink:0;color:var(--accent)}
+div.logo{display:flex;align-items:center;gap:6px;flex-shrink:0;color:var(--accent);cursor:pointer;user-select:none}
 [data-theme=light] div.logo{color:#fff}
 [data-theme=dark] div.logo{color:#fff}
 nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
@@ -557,6 +557,43 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
   flex-wrap:nowrap;
 }
 .editor-options::-webkit-scrollbar{height:0}
+
+/* ── FOCUS / DISTRACTION-FREE MODE ───────────── */
+.editor-layout{position:relative}
+.ne-focus-fab{
+  position:absolute;bottom:20px;right:20px;z-index:200;
+  width:52px;height:52px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 6px 20px rgba(var(--accent-r),var(--accent-g),var(--accent-b),.45);
+  display:flex;align-items:center;justify-content:center;
+  transition:var(--tr);touch-action:manipulation;
+}
+.ne-focus-fab:active{opacity:.82;transform:scale(.94)}
+.ne-focus-fab svg{width:24px;height:24px;fill:#fff;flex-shrink:0}
+/* Focus-mode buttons inside topbar — hidden by default */
+.ne-focus-action{display:none!important}
+/* When focus mode is ON */
+.editor-layout.focus-mode .fmt-toolbar,
+.editor-layout.focus-mode .editor-options{display:none!important}
+.editor-layout.focus-mode .ne-focus-fab{display:none!important}
+.editor-layout.focus-mode .editor-topbar>*:not(.ne-focus-action){display:none!important}
+.editor-layout.focus-mode .ne-focus-action{
+  display:flex!important;align-items:center;justify-content:center;
+}
+.ne-focus-cancel{
+  width:40px;height:40px;border-radius:var(--rs);flex-shrink:0;
+  background:rgba(239,68,68,.22);border:1px solid rgba(239,68,68,.45);
+  color:#fff;transition:var(--tr);
+}
+.ne-focus-cancel:active{background:rgba(239,68,68,.4)!important}
+.ne-focus-cancel svg{width:20px;height:20px;stroke:#fff;fill:none;flex-shrink:0}
+.ne-focus-save{
+  width:40px;height:40px;border-radius:var(--rs);flex-shrink:0;
+  background:rgba(34,197,94,.28);border:1px solid rgba(34,197,94,.55);
+  color:#fff;transition:var(--tr);
+}
+.ne-focus-save:active{background:rgba(34,197,94,.45)!important}
+.ne-focus-save svg{width:20px;height:20px;stroke:#fff;fill:none;flex-shrink:0}
 /* ── EDITOR BOTTOM BAR ─────────────────── */
 .editor-bottombar{
   display:flex;align-items:center;justify-content:center;
@@ -751,10 +788,11 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .folder-card-name{font-size:12px;font-weight:700;text-align:left;word-break:break-word;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .folder-card-count{font-size:10px;color:var(--text3)}
 .folder-card-actions{
-  display:flex;flex-direction:row;gap:2px;
+  display:none;flex-direction:row;gap:2px;
   border-top:1px solid var(--border);
-  padding-top:6px;margin-top:2px;
+  padding-top:6px;margin-top:6px;
 }
+.folder-card.lp-active .folder-card-actions{display:flex}
 .folder-card-actions .act-btn{flex:1;width:auto;height:30px;border-radius:var(--rs);}
 .folder-card-actions .act-btn .ms{font-size:16px}
 .folder-card-date{font-size:10px;color:var(--text3);margin-top:1px}
@@ -970,40 +1008,6 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .note-pin-marker{text-align:center;padding:8px 0 4px;line-height:1;user-select:none;pointer-events:none;}
 #ne-pin-marker-slot{background:#faf8f4;}
 
-/* ── READING MODE ─────────────── */
-#reading-mode{
-  position:fixed;inset:0;z-index:3000;
-  background:var(--bg);display:none;flex-direction:column;
-  animation:modalIn .22s ease;
-}
-#reading-mode.open{display:flex}
-#reading-mode-bar{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 14px;border-bottom:1px solid var(--border);
-  background:var(--accent);flex-shrink:0;
-}
-#reading-mode-bar h3{flex:1;font-size:15px;font-weight:700;color:#fff}
-#reading-mode-content{
-  flex:1;overflow-y:auto;padding:0;background:var(--bg2);
-  -webkit-overflow-scrolling:touch;
-}
-#reading-mode-note{
-  min-height:100%;width:100%;max-width:800px;margin:0 auto;
-  font-family:var(--item-font);font-size:var(--fs);line-height:32px;
-  padding:28px 36px 28px 22px;overflow-wrap:break-word;word-break:break-word;
-  color:#1a1a2e;
-}
-#reading-mode-note ul{padding-left:1.6em;margin:4px 0;list-style:disc}
-#reading-mode-note ol{padding-left:1.6em;margin:4px 0;list-style:decimal}
-#reading-mode-note li{display:list-item}
-.read-edit-btn{
-  display:flex;align-items:center;gap:6px;
-  padding:8px 16px;border-radius:var(--rs);
-  background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);
-  color:#fff;font-size:13px;font-weight:700;transition:var(--tr);
-}
-.read-edit-btn:active{background:rgba(255,255,255,.35)}
-.read-edit-btn .ms{font-size:18px}
 
 /* ── HEADER SELECT SIZING ──────── */
 #month-sel{width:120px}
@@ -1232,6 +1236,129 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
 .enc-bio-divider::before,.enc-bio-divider::after{
   content:'';flex:1;height:1px;background:var(--border2);
 }
+
+/* ── PASSWORD VAULT ─────────────── */
+#vault-view{
+  display:none;flex-direction:column;
+  position:fixed;inset:0;bottom:calc(var(--nav-h) + var(--safe-bottom));
+  top:var(--hh);background:var(--bg);z-index:70;overflow:hidden;
+}
+#vault-view.open{display:flex}
+.vault-head{
+  display:flex;align-items:center;gap:10px;
+  padding:14px 16px 10px;flex-shrink:0;
+  border-bottom:1px solid var(--border);
+}
+.vault-head h2{font-size:17px;font-weight:700;flex:1;letter-spacing:-.3px}
+.vault-search-wrap{
+  padding:10px 14px 8px;flex-shrink:0;
+}
+.vault-search{
+  width:100%;padding:10px 14px 10px 38px;
+  border-radius:50px;background:var(--surface2);
+  border:1px solid var(--border);color:var(--text);
+  font-size:14px;font-family:var(--ui-font);
+  transition:var(--tr);position:relative;
+}
+.vault-search:focus{border-color:var(--accent-border);box-shadow:0 0 0 3px var(--accent-soft);outline:none}
+.vault-search-icon{
+  position:absolute;left:26px;top:50%;transform:translateY(-50%);
+  color:var(--text3);pointer-events:none;
+}
+.vault-search-icon .ms{font-size:18px}
+.vault-search-row{position:relative;flex-shrink:0;padding:8px 14px 6px;margin-top:4px}
+.vault-list{flex:1;overflow-y:auto;padding:6px 12px 12px;-webkit-overflow-scrolling:touch}
+.vault-card{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px 14px;margin-bottom:8px;
+  position:relative;overflow:hidden;transition:var(--tr);
+}
+.vault-card::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--accent);border-radius:2px 0 0 2px;
+}
+.vault-card-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.vault-favicon{
+  width:36px;height:36px;border-radius:var(--rs);
+  background:var(--accent-soft);border:1px solid var(--accent-border);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:13px;font-weight:700;color:var(--accent);overflow:hidden;
+}
+.vault-favicon img{width:100%;height:100%;object-fit:contain;border-radius:var(--rs)}
+.vault-site{font-size:14px;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vault-user{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
+.vault-pass-row{display:flex;align-items:center;gap:6px}
+.vault-pass-val{
+  flex:1;font-family:monospace;font-size:13px;
+  color:var(--text2);letter-spacing:1px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;
+}
+.vault-copy-btn{
+  padding:6px 10px;border-radius:var(--rs);font-size:11px;font-weight:700;
+  background:var(--accent-soft);color:var(--accent);border:1px solid var(--accent-border);
+  transition:var(--tr);white-space:nowrap;display:flex;align-items:center;gap:4px;
+}
+.vault-copy-btn:active{background:var(--accent);color:#fff}
+.vault-copy-btn .ms{font-size:14px}
+.vault-actions{display:flex;gap:6px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)}
+.vault-fab{
+  position:fixed;bottom:calc(var(--nav-h) + var(--safe-bottom) + 16px);
+  right:16px;width:52px;height:52px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  box-shadow:0 6px 20px rgba(var(--accent-r),var(--accent-g),var(--accent-b),.45);
+  display:none;align-items:center;justify-content:center;
+  z-index:75;transition:var(--tr);touch-action:manipulation;
+}
+.vault-fab.open{display:flex}
+.vault-fab:active{transform:scale(.93)}
+.vault-fab .ms{font-size:26px}
+.vault-empty{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex:1;gap:10px;color:var(--text3);padding:40px 20px;text-align:center;
+}
+.vault-empty .ms{font-size:48px;color:var(--text3);opacity:.5}
+.vault-empty p{font-size:14px;line-height:1.5}
+.pass-gen-row{display:flex;align-items:center;gap:8px;margin-top:4px}
+.pass-gen-out{
+  flex:1;padding:10px 12px;border-radius:var(--rs);
+  background:var(--surface3);border:1px solid var(--border);
+  font-family:monospace;font-size:13px;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.vault-strength-row{display:flex;gap:4px;height:3px;margin-top:6px;border-radius:2px;overflow:hidden}
+.vault-strength-seg{flex:1;background:var(--surface3);border-radius:2px;transition:background .3s}
+.vault-enc-gate{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex:1;gap:14px;padding:32px 24px;text-align:center;color:var(--text2);
+}
+.vault-enc-gate .ms{font-size:52px;color:var(--text3);opacity:.6}
+.vault-enc-gate h3{font-size:16px;font-weight:700;color:var(--text)}
+.vault-enc-gate p{font-size:13px;line-height:1.5}
+
+/* vault type chips */
+.vault-type-chips{display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap}
+.vault-type-chip{
+  flex:1;min-width:70px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:8px 6px;border-radius:var(--rs);
+  background:var(--surface2);border:1.5px solid var(--border);
+  color:var(--text2);font-size:11px;font-weight:700;cursor:pointer;
+  transition:var(--tr);letter-spacing:.2px;
+}
+.vault-type-chip .ms{font-size:20px}
+.vault-type-chip.active{
+  background:var(--accent-soft);border-color:var(--accent);color:var(--accent);
+}
+.vault-type-chip:active{opacity:.8}
+
+/* vault card chip */
+.vault-card-chip{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;
+  background:var(--surface3);color:var(--text3);
+  border:1px solid var(--border2);flex-shrink:0;
+}
+
+
 </style>
 </head>
 <body>
@@ -1307,11 +1434,32 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
     <span class="ms">search</span>
     <span class="nav-label">Search</span>
   </button>
+  <button class="nav-item" id="nav-vault" onclick="openVault();setNavActive('nav-vault')">
+    <span class="ms">key</span>
+    <span class="nav-label">Vault</span>
+  </button>
   <button class="nav-item" id="nav-settings" onclick="openSettings();setNavActive('nav-settings')">
     <span class="ms">settings</span>
     <span class="nav-label">Settings</span>
   </button>
 </nav>
+
+<!-- PASSWORD VAULT VIEW -->
+<div id="vault-view">
+  <div class="vault-head">
+    <span class="ms" style="color:var(--accent)">key</span>
+    <h2>Password Vault</h2>
+    <button class="ibtn" id="vault-lock-btn" title="Lock vault"><span class="ms">lock</span></button>
+  </div>
+  <div class="vault-search-row">
+    <span class="vault-search-icon"><span class="ms">search</span></span>
+    <input class="vault-search" id="vault-search" placeholder="Search sites, usernames…" type="search" autocomplete="off">
+  </div>
+  <div class="vault-list" id="vault-list"></div>
+</div>
+
+<!-- VAULT FAB -->
+<button class="vault-fab" id="vault-fab" title="Add password"><span class="ms">add</span></button>
 
 <!-- OVERLAY & MODAL -->
 <div id="overlay">
@@ -1378,7 +1526,7 @@ const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
 let S={
   settings:{theme:'light',accent:'#6366f1',fontSize:14,uiFont:'Comfortaa',itemFont:'Kalam'},
-  folders:[],notes:[],todos:[],tables:[],
+  folders:[],notes:[],todos:[],tables:[],passwords:[],
   calYear:new Date().getFullYear(),calMonth:new Date().getMonth(),
   selectedDate:null,foldersSort:'name-asc',foldersView:'grid'
 };
@@ -1431,6 +1579,7 @@ async function enc_decrypt(key, iv64, data64){
 function _sensitivePayload(){
   return {
     folders:S.folders, notes:S.notes, todos:S.todos, tables:S.tables,
+    passwords:S.passwords||[],
     calYear:S.calYear, calMonth:S.calMonth,
     selectedDate:S.selectedDate,
     foldersSort:S.foldersSort, foldersView:S.foldersView
@@ -1699,6 +1848,7 @@ function setNavActive(id){
 }
 function goHome(){
   closeModal();
+  closeVault();
   const n=new Date();S.calYear=n.getFullYear();S.calMonth=n.getMonth();
   S.selectedDate=null;
   renderCalendar();
@@ -2086,7 +2236,18 @@ function openNoteEditor(id){
       <div class="editor-topbar">
         <button class="ibtn" id="ne-cancel" title="Cancel"><span class="ms">close</span></button>
         <input class="editor-title-input" id="ne-title" placeholder="Note title…" value="${note?note.title:''}">
-        <button class="ibtn ne-sq ne-save-sq" id="ne-read" title="Reading mode"><span class="ms">fullscreen</span></button>
+        <!-- focus-mode controls (hidden until focus mode activates) -->
+        <button class="ne-focus-action ne-focus-cancel" id="ne-focus-cancel" title="Discard changes">
+          <svg viewBox="0 0 24 24" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" y1="4" x2="20" y2="20"/><line x1="20" y1="4" x2="4" y2="20"/>
+          </svg>
+        </button>
+        <button class="ne-focus-action ne-focus-save" id="ne-focus-save" title="Save &amp; return">
+          <svg viewBox="0 0 24 24" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="4,12 10,18 20,6"/>
+          </svg>
+        </button>
+        <!-- /focus-mode controls -->
         <select class="form-select ne-folder-inline" id="ne-folder">${folderSelect(note?note.folderId:S.folders[0]?.id)}</select>
         <button class="ibtn ne-sq ne-clear-sq" id="ne-clear" title="Clear"><span class="ms">backspace</span></button>
         <button class="ibtn ne-sq ne-save-sq" id="ne-save" title="Save"><span class="ms">check</span></button>
@@ -2135,6 +2296,12 @@ function openNoteEditor(id){
         <div id="ne-pin-marker-slot"></div>
         <div class="note-area note-bg-${bg}" id="ne-content" contenteditable="true" spellcheck="true">${note?note.content:''}</div>
       </div>
+      <!-- Distraction-free FAB -->
+      <button class="ne-focus-fab" id="ne-focus-fab" title="Focus mode">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+        </svg>
+      </button>
     </div>`,
   'modal modal-full');
 
@@ -2303,42 +2470,45 @@ function openNoteEditor(id){
   function removePinMarker(){pinSlot.innerHTML='';}
   if(curPinned)insertPinMarker();
 
-  // ── Reading mode ─────────────────────────────────
-  document.getElementById('ne-read').addEventListener('click',()=>{
-    openReadingMode();
-  });
-  function openReadingMode(){
-    let rm=document.getElementById('reading-mode');
-    if(!rm){
-      rm=document.createElement('div');rm.id='reading-mode';
-      rm.innerHTML=`
-        <div id="reading-mode-bar">
-          <h3 id="rm-title">${document.getElementById('ne-title').value||'Note'}</h3>
-          <button class="read-edit-btn" id="rm-close"><span class="ms">close</span></button>
-        </div>
-        <div id="reading-mode-content">
-          <div id="reading-mode-note" contenteditable="true" spellcheck="true"></div>
-        </div>`;
-      document.body.appendChild(rm);
-    }
-    // Sync editor → reading mode
-    document.getElementById('rm-title').textContent=document.getElementById('ne-title').value||'Note';
-    const rmNote=document.getElementById('reading-mode-note');
-    rmNote.innerHTML=area.innerHTML;
-    rmNote.style.fontFamily=area.style.fontFamily||`'Comfortaa',sans-serif`;
-    rmNote.style.fontSize=area.style.fontSize||'20px';
-    rmNote.style.backgroundColor=area.style.backgroundColor||'#faf8f4';
-    rmNote.style.backgroundImage=area.style.backgroundImage||'';
-    rmNote.style.backgroundSize=area.style.backgroundSize||'';
-    rmNote.className=area.className.replace('note-area','').trim();
-    rm.classList.add('open');
-    rmNote.focus();
-    // Sync reading mode → editor on close
-    function syncBack(){area.innerHTML=rmNote.innerHTML;rm.classList.remove('open');}
-    document.getElementById('rm-close').onclick=syncBack;
-  }
-  document.getElementById('ne-clear').addEventListener('click',()=>{
+    document.getElementById('ne-clear').addEventListener('click',()=>{
     if(confirm('Clear all note content?')){area.innerHTML='';area.focus();}
+  });
+
+  // ── Focus / distraction-free mode ───────────────
+  let _focusSnapshot='';
+  const _focusLayout=document.querySelector('.editor-layout');
+  document.getElementById('ne-focus-fab').addEventListener('click',()=>{
+    _focusSnapshot=area.innerHTML;
+    _focusLayout.classList.add('focus-mode');
+    area.focus();
+  });
+  document.getElementById('ne-focus-cancel').addEventListener('click',()=>{
+    area.innerHTML=_focusSnapshot;
+    _focusLayout.classList.remove('focus-mode');
+    area.focus();
+  });
+  document.getElementById('ne-focus-save').addEventListener('click',()=>{
+    // Persist changes without closing the editor
+    const folderId=document.getElementById('ne-folder').value;
+    if(!folderId){toast('Select a folder','error');return;}
+    const title=document.getElementById('ne-title').value.trim()||'Untitled Note';
+    const clone=area.cloneNode(true);
+    clone.querySelectorAll('[data-pin="1"]').forEach(m=>m.remove());
+    const content=clone.innerHTML;
+    const bgSel=document.getElementById('ne-bg-sel').value||'plain';
+    const noteFont=document.getElementById('ne-font-sel').value||'Comfortaa';
+    const fontSize=parseInt(document.getElementById('ne-font-size').value)||20;
+    const bgColor=document.getElementById('ne-bg-color').value||'#faf8f4';
+    const pinned=document.getElementById('ne-pin').classList.contains('active');
+    if(note){
+      note.title=title;note.content=content;note.folderId=folderId;note.bg=bgSel;note.noteFont=noteFont;note.bgColor=bgColor;note.fontSize=fontSize;note.pinned=pinned;
+      if(noteCustomBg)note.customBg=noteCustomBg;
+    }else{
+      S.notes.push({id:uid(),folderId,title,content,bg:bgSel,noteFont,bgColor,fontSize,pinned,customBg:noteCustomBg||'',date:S.selectedDate||today(),createdAt:Date.now()});
+    }
+    saveS();renderDayPanel();renderCalendar();toast('Note saved','success');
+    _focusLayout.classList.remove('focus-mode');
+    area.focus();
   });
 
   function saveNote(){
@@ -2753,6 +2923,7 @@ function duplicateFolder(id){
    FOLDERS VIEW
 ═══════════════════════════════════════════════ */
 function openFoldersView(){
+  closeVault();
   openModal(`
     <div class="editor-layout" style="height:100%">
       <div class="modal-head">
@@ -2871,11 +3042,33 @@ function renderFolderCards(){
     el.style.animationDelay=`${i*45}ms`;
   });
   document.querySelectorAll('.folder-card').forEach(el=>{
+    let lpTimer;
+    function startLP(){
+      lpTimer=setTimeout(()=>{
+        document.querySelectorAll('.folder-card').forEach(c=>c.classList.remove('lp-active'));
+        el.classList.add('lp-active');
+        if(navigator.vibrate) navigator.vibrate(30);
+      },500);
+    }
+    function cancelLP(){ clearTimeout(lpTimer); }
+    el.addEventListener('mousedown', startLP);
+    el.addEventListener('touchstart', startLP, {passive:true});
+    el.addEventListener('mouseup', cancelLP);
+    el.addEventListener('mouseleave', cancelLP);
+    el.addEventListener('touchend', cancelLP);
+    el.addEventListener('touchcancel', cancelLP);
     el.addEventListener('click',e=>{
-      if(e.target.closest('[data-fa]'))return;
+      if(e.target.closest('[data-fa]')) return;
+      if(el.classList.contains('lp-active')){ el.classList.remove('lp-active'); return; }
       openFolderItems(el.dataset.fid);
     });
   });
+  // Tap anywhere else dismisses active folder
+  setTimeout(()=>{
+    document.querySelector('#fv-list')?.addEventListener('click',e=>{
+      if(!e.target.closest('.folder-card')) document.querySelectorAll('.folder-card').forEach(c=>c.classList.remove('lp-active'));
+    });
+  },0);
 }
 
 function openFolderItems(fid){
@@ -2969,6 +3162,7 @@ function openFolderItems(fid){
    SETTINGS
 ═══════════════════════════════════════════════ */
 function openSettings(){
+  closeVault();
   const{theme,accent,fontSize,uiFont,itemFont}=S.settings;
   const aSwatches=ACCENT_COLORS.map(c=>`<div class="accent-swatch${c===accent?' active':''}" data-color="${c}" style="background:${c}"></div>`).join('');
   const ALL_FONTS=['Caveat','Comfortaa','DM Sans','Indie Flower','Inter','Kalam','Open Sans','Poppins','Reenie Beanie','Roboto'];
@@ -3070,6 +3264,7 @@ function openSettings(){
    SEARCH
 ═══════════════════════════════════════════════ */
 function openSearch(){
+  closeVault();
   openModal(`
     <div class="editor-layout" style="height:100%">
       <div class="search-input-wrap">
@@ -3322,6 +3517,16 @@ function exportImage(type,id,mode){
    EVENT SETUP
 ═══════════════════════════════════════════════ */
 function setupEvents(){
+  // Logo click → lock & return to password screen
+  document.querySelector('div.logo').addEventListener('click',()=>{
+    if(!_cryptoKey){ return; } // already locked, nothing to do
+    if(!confirm('Lock vault and log out?')) return;
+    _cryptoKey = null;
+    closeVault();
+    closeModal();
+    goHome();
+    showEncLockScreen('unlock');
+  });
   // Stub home btn (hidden, used by JS elsewhere)
   document.getElementById('btn-home').addEventListener('click',()=>goHome());
 
@@ -3746,6 +3951,624 @@ if ('serviceWorker' in navigator) {
       .then(reg => console.log('SW registered:', reg.scope))
       .catch(err => console.warn('SW registration failed:', err));
   });
+}
+
+/* ═══════════════════════════════════════════════
+   PASSWORD VAULT
+═══════════════════════════════════════════════ */
+let _vaultOpen = false;
+let _vaultClipTimer = null;
+
+function _vaultInit(){
+  if(!S.passwords) S.passwords=[];
+}
+
+/* ── Password strength scorer ── */
+function _passStrength(p){
+  if(!p) return 0;
+  let s=0;
+  if(p.length>=8)  s++;
+  if(p.length>=14) s++;
+  if(/[A-Z]/.test(p)&&/[a-z]/.test(p)) s++;
+  if(/[0-9]/.test(p)) s++;
+  if(/[^A-Za-z0-9]/.test(p)) s++;
+  return Math.min(4,s);
+}
+
+function _passStrengthLabel(n){return['','Weak','Fair','Good','Strong'][n]||''}
+function _passStrengthColor(n){return['','#ef4444','#f97316','#eab308','#22c55e'][n]||'var(--surface3)'}
+
+/* ── Password generator ── */
+function generatePassword(len=20,sym=true){
+  const lc='abcdefghijklmnopqrstuvwxyz';
+  const uc='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const digits='0123456789';
+  const syms='!@#$%^&*()-_=+[]{}|;:,.<>?';
+  let pool=lc+uc+digits+(sym?syms:'');
+  let pass='';
+  const arr=new Uint32Array(len);
+  crypto.getRandomValues(arr);
+  for(let i=0;i<len;i++) pass+=pool[arr[i]%pool.length];
+  // Guarantee at least one of each category
+  const cats=[lc,uc,digits,sym?syms:null].filter(Boolean);
+  const patched=pass.split('');
+  cats.forEach((cat,i)=>{
+    const idx=new Uint32Array(1); crypto.getRandomValues(idx);
+    patched[i]=cat[idx[0]%cat.length];
+  });
+  // Shuffle
+  for(let i=patched.length-1;i>0;i--){
+    const j=new Uint32Array(1); crypto.getRandomValues(j);
+    [patched[i],patched[j[0]%(i+1)]]=[patched[j[0]%(i+1)],patched[i]];
+  }
+  return patched.join('');
+}
+
+/* ── Favicon helper ── */
+function _faviconUrl(site){
+  if(!site) return null;
+  let host=site.trim();
+  if(!/^https?:\/\//i.test(host)) host='https://'+host;
+  try{ return 'https://www.google.com/s2/favicons?sz=64&domain='+new URL(host).hostname; }
+  catch(e){ return null; }
+}
+
+function _faviconHtml(site,label){
+  const url=_faviconUrl(site);
+  const letter=(label||site||'?')[0].toUpperCase();
+  if(url) return `<img src="${url}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt=""><span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--accent)">${letter}</span>`;
+  return `<span style="font-size:14px;font-weight:700">${letter}</span>`;
+}
+
+/* ── Copy with auto-clear ── */
+function _vaultCopy(text, btn, label='Copied!'){
+  navigator.clipboard.writeText(text).then(()=>{
+    const orig=btn.innerHTML;
+    btn.innerHTML=`<span class="ms">check</span> ${label}`;
+    btn.style.background='rgba(34,197,94,.15)';btn.style.color='#22c55e';btn.style.borderColor='rgba(34,197,94,.3)';
+    clearTimeout(_vaultClipTimer);
+    _vaultClipTimer=setTimeout(()=>{
+      navigator.clipboard.writeText('').catch(()=>{});
+      btn.innerHTML=orig;btn.style.background='';btn.style.color='';btn.style.borderColor='';
+    },30000);
+  }).catch(()=>toast('Clipboard access denied','error'));
+}
+
+/* ── Render vault list ── */
+function _vaultTypeIcon(t){ return t==='bank'?'account_balance':t==='card'?'credit_card':t==='basic'?'key':'language'; }
+function _vaultTypeLabel(t){ return t==='bank'?'Bank':t==='card'?'Card':t==='basic'?'Basic':'Password'; }
+function _maskCard(n){ if(!n)return''; const d=n.replace(/\s/g,''); return '****-****-****-'+d.slice(-4); }
+
+function _vaultCardHTML(p){
+  const t=p.type||'password';
+  const str=_passStrength(p.pass||p.cvv||'');
+  const col=_passStrengthColor(str);
+  const lbl=_passStrengthLabel(str);
+  const typeIcon=_vaultTypeIcon(t);
+  const typeChip=`<span class="vault-card-chip"><span class="ms" style="font-size:12px">${typeIcon}</span>${_vaultTypeLabel(t)}</span>`;
+
+  if(t==='card'){
+    const cardType=p.cardType==='debit'?'Debit':'Credit';
+    return`<div class="vault-card" id="vc-${p.id}">
+      <div class="vault-card-top">
+        <div class="vault-favicon" style="background:linear-gradient(135deg,var(--accent-soft),var(--surface3))">
+          <span class="ms" style="font-size:20px;color:var(--accent)">credit_card</span>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="vault-site">${p.label||'Card'}</div>
+          <div class="vault-user">${p.cardHolder||'—'} · ${cardType}</div>
+        </div>
+        ${typeChip}
+      </div>
+      ${p.cardNum?`<div class="vault-pass-row" style="margin-bottom:6px">
+        <span class="vault-pass-val" id="vp-${p.id}" style="font-family:monospace;letter-spacing:2px">${_maskCard(p.cardNum)}</span>
+        <button class="vault-copy-btn" id="vshow-${p.id}" onclick="vToggleField('${p.id}','cardNum','${_maskCard(p.cardNum)}')"><span class="ms">visibility</span> Show</button>
+        <button class="vault-copy-btn" id="vcopy-${p.id}" onclick="vCopyField('${p.id}','cardNum')"><span class="ms">content_copy</span> Copy</button>
+      </div>`:''}
+      <div class="vault-actions">
+        ${p.expiry?`<button class="vault-copy-btn" id="vce-${p.id}" onclick="vCopyField('${p.id}','expiry')"><span class="ms">event</span> Expiry</button>`:''}
+        ${p.cvv?`<button class="vault-copy-btn" id="vcc-${p.id}" onclick="vCopyField('${p.id}','cvv')"><span class="ms">lock</span> CVV</button>`:''}
+        ${p.pin?`<button class="vault-copy-btn" id="vcp-${p.id}" onclick="vCopyField('${p.id}','pin')"><span class="ms">pin</span> PIN</button>`:''}
+        <div style="flex:1"></div>
+        <button class="vault-copy-btn" style="background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.25)" onclick="vDelete('${p.id}')"><span class="ms">delete</span></button>
+        <button class="vault-copy-btn" onclick="vEdit('${p.id}')"><span class="ms">edit</span></button>
+      </div>
+    </div>`;
+  }
+
+  if(t==='bank'){
+    return`<div class="vault-card" id="vc-${p.id}" style="--folder-color:#22c55e">
+      <div class="vault-card-top">
+        <div class="vault-favicon" style="background:rgba(34,197,94,.15);border-color:rgba(34,197,94,.3)">
+          <span class="ms" style="font-size:20px;color:#22c55e">account_balance</span>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="vault-site">${p.bankName||'Bank'}</div>
+          <div class="vault-user">${p.user||'—'}</div>
+        </div>
+        ${typeChip}
+      </div>
+      <div class="vault-pass-row">
+        <span class="vault-pass-val" id="vp-${p.id}">••••••••••••</span>
+        <button class="vault-copy-btn" id="vshow-${p.id}" onclick="vTogglePass('${p.id}')"><span class="ms">visibility</span> Show</button>
+        <button class="vault-copy-btn" id="vcopy-${p.id}" onclick="vCopyPass('${p.id}')"><span class="ms">content_copy</span> Copy</button>
+      </div>
+      <div class="vault-actions">
+        ${p.user?`<button class="vault-copy-btn" id="vcu-${p.id}" onclick="vCopyUser('${p.id}')"><span class="ms">person</span> User</button>`:''}
+        ${p.accountNum?`<button class="vault-copy-btn" id="vca-${p.id}" onclick="vCopyField('${p.id}','accountNum')"><span class="ms">tag</span> Acct</button>`:''}
+        ${p.url?`<button class="vault-copy-btn" onclick="window.open('${p.url.startsWith('http')?p.url:'https://'+p.url}','_blank')"><span class="ms">open_in_new</span></button>`:''}
+        <div style="flex:1"></div>
+        <button class="vault-copy-btn" style="background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.25)" onclick="vDelete('${p.id}')"><span class="ms">delete</span></button>
+        <button class="vault-copy-btn" onclick="vEdit('${p.id}')"><span class="ms">edit</span></button>
+      </div>
+    </div>`;
+  }
+
+  if(t==='basic'){
+    return`<div class="vault-card" id="vc-${p.id}" style="--folder-color:#f59e0b">
+      <div class="vault-card-top">
+        <div class="vault-favicon" style="background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3)">
+          <span class="ms" style="font-size:20px;color:#f59e0b">key</span>
+        </div>
+        <div style="flex:1;min-width:0">
+          <div class="vault-site">${p.label||'Password'}</div>
+          ${p.notes?`<div class="vault-user" style="font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.notes.slice(0,40)}</div>`:''}
+        </div>
+        ${typeChip}
+      </div>
+      <div class="vault-pass-row">
+        <span class="vault-pass-val" id="vp-${p.id}">••••••••••••</span>
+        <button class="vault-copy-btn" id="vshow-${p.id}" onclick="vTogglePass('${p.id}')"><span class="ms">visibility</span> Show</button>
+        <button class="vault-copy-btn" id="vcopy-${p.id}" onclick="vCopyPass('${p.id}')"><span class="ms">content_copy</span> Copy</button>
+      </div>
+      <div class="vault-actions">
+        <div style="flex:1"></div>
+        <button class="vault-copy-btn" style="background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.25)" onclick="vDelete('${p.id}')"><span class="ms">delete</span></button>
+        <button class="vault-copy-btn" onclick="vEdit('${p.id}')"><span class="ms">edit</span></button>
+      </div>
+    </div>`;
+  }
+
+  // default: password
+  const strLbl=lbl?`<span style="font-size:10px;font-weight:700;color:${col};background:${col}22;padding:2px 7px;border-radius:20px;border:1px solid ${col}44">${lbl}</span>`:'';
+  return`<div class="vault-card" id="vc-${p.id}">
+    <div class="vault-card-top">
+      <div class="vault-favicon">${_faviconHtml(p.site,p.label||p.site)}</div>
+      <div style="flex:1;min-width:0">
+        <div class="vault-site">${p.label||p.site}</div>
+        <div class="vault-user">${p.user||'—'}</div>
+      </div>
+      ${strLbl}
+    </div>
+    <div class="vault-pass-row">
+      <span class="vault-pass-val" id="vp-${p.id}">••••••••••••</span>
+      <button class="vault-copy-btn" id="vshow-${p.id}" onclick="vTogglePass('${p.id}')"><span class="ms">visibility</span> Show</button>
+      <button class="vault-copy-btn" id="vcopy-${p.id}" onclick="vCopyPass('${p.id}')"><span class="ms">content_copy</span> Copy</button>
+    </div>
+    <div class="vault-actions">
+      ${p.user?`<button class="vault-copy-btn" id="vcu-${p.id}" onclick="vCopyUser('${p.id}')"><span class="ms">person</span> User</button>`:''}
+      ${p.url?`<button class="vault-copy-btn" onclick="window.open('${p.url.startsWith('http')?p.url:'https://'+p.url}','_blank')"><span class="ms">open_in_new</span> Open</button>`:''}
+      <div style="flex:1"></div>
+      <button class="vault-copy-btn" style="background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.25)" onclick="vDelete('${p.id}')"><span class="ms">delete</span></button>
+      <button class="vault-copy-btn" onclick="vEdit('${p.id}')"><span class="ms">edit</span></button>
+    </div>
+  </div>`;
+}
+
+function renderVault(filter=''){
+  _vaultInit();
+  const list=document.getElementById('vault-list');
+  if(!list) return;
+
+  if(!_cryptoKey){
+    list.innerHTML=`<div class="vault-enc-gate">
+      <span class="ms">lock</span>
+      <h3>Vault Locked</h3>
+      <p>Enable & unlock encryption in Settings to use the Password Vault. Your passwords are always encrypted at rest.</p>
+      <button class="btn primary" onclick="openSettings();setNavActive('nav-settings')"><span class="ms">settings</span> Open Settings</button>
+    </div>`;
+    document.getElementById('vault-fab').classList.remove('open');
+    return;
+  }
+
+  const q=filter.toLowerCase();
+  const items=(S.passwords||[]).filter(p=>{
+    if(!q) return true;
+    return (p.site||'').toLowerCase().includes(q)
+      ||(p.user||'').toLowerCase().includes(q)
+      ||(p.label||'').toLowerCase().includes(q)
+      ||(p.bankName||'').toLowerCase().includes(q)
+      ||(p.cardHolder||'').toLowerCase().includes(q);
+  });
+
+  if(!items.length){
+    list.innerHTML=`<div class="vault-empty"><span class="ms">key_off</span><p>${q?'No results for "'+q+'"':'No entries yet.<br>Tap + to add your first.'}</p></div>`;
+    document.getElementById('vault-fab').classList.add('open');
+    return;
+  }
+
+  document.getElementById('vault-fab').classList.add('open');
+  list.innerHTML=items.map(_vaultCardHTML).join('');
+}
+
+function vTogglePass(id){
+  const el=document.getElementById('vp-'+id);
+  const btn=document.getElementById('vshow-'+id);
+  const p=S.passwords.find(x=>x.id===id);
+  if(!p) return;
+  if(el.textContent==='••••••••••••'||el.textContent.startsWith('•')){
+    el.textContent=p.pass;
+    btn.innerHTML=`<span class="ms">visibility_off</span> Hide`;
+  } else {
+    el.textContent='••••••••••••';
+    btn.innerHTML=`<span class="ms">visibility</span> Show`;
+  }
+}
+
+function vCopyPass(id){
+  const p=S.passwords.find(x=>x.id===id);
+  if(!p) return;
+  const btn=document.getElementById('vcopy-'+id);
+  _vaultCopy(p.pass,btn,'Copied!');
+  // Auto-hide password if visible
+  const el=document.getElementById('vp-'+id);
+  if(el && !el.textContent.startsWith('•')){
+    el.textContent='••••••••••••';
+    const sb=document.getElementById('vshow-'+id);
+    if(sb) sb.innerHTML=`<span class="ms">visibility</span> Show`;
+  }
+}
+
+function vCopyUser(id){
+  const p=S.passwords.find(x=>x.id===id);
+  if(!p||!p.user) return;
+  const btn=document.getElementById('vcu-'+id);
+  _vaultCopy(p.user,btn,'Copied!');
+}
+
+function vToggleField(id, field, maskedVal){
+  const el=document.getElementById('vp-'+id);
+  const btn=document.getElementById('vshow-'+id);
+  const p=S.passwords.find(x=>x.id===id);
+  if(!p) return;
+  if(el.textContent===maskedVal||el.textContent.startsWith('*')){
+    el.textContent=p[field]||'';
+    btn.innerHTML=`<span class="ms">visibility_off</span> Hide`;
+  } else {
+    el.textContent=maskedVal;
+    btn.innerHTML=`<span class="ms">visibility</span> Show`;
+  }
+}
+
+function vCopyField(id, field){
+  const p=S.passwords.find(x=>x.id===id);
+  if(!p||!p[field]) return;
+  const btn=document.getElementById('vc'+(field==='cardNum'?'opy':field==='expiry'?'e':field==='cvv'?'c':field==='pin'?'p':field==='accountNum'?'a':'opy')+'-'+id);
+  _vaultCopy(p[field],btn,'Copied!');
+}
+
+function vDelete(id){
+  if(!confirm('Delete this password?')) return;
+  S.passwords=(S.passwords||[]).filter(x=>x.id!==id);
+  saveS();
+  renderVault(document.getElementById('vault-search')?.value||'');
+  toast('Password deleted','info');
+}
+
+function vEdit(id){
+  const p=S.passwords.find(x=>x.id===id);
+  if(p) openVaultModal(p);
+}
+
+/* ── Add / Edit modal ── */
+function openVaultModal(existing){
+  if(!_cryptoKey){ toast('Enable encryption first','error'); return; }
+  const isEdit=!!existing;
+  const p=existing ? {...existing} : {id:uid(),type:'password',site:'',label:'',url:'',user:'',pass:'',notes:'',
+    bankName:'',accountNum:'',routingNum:'',
+    cardType:'credit',cardHolder:'',cardNum:'',expiry:'',cvv:'',pin:''};
+  let currentType=p.type||'password';
+  const initPass=p.pass||generatePassword();
+  if(!p.pass&&currentType==='password') p.pass=initPass;
+
+  function typeFields(t){
+    if(t==='card') return`
+      <div class="form-group">
+        <label class="form-label">Card Label *</label>
+        <input class="form-input" id="vm-label" placeholder="Chase Sapphire, Barclays Visa…" value="${p.label||''}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Card Type</label>
+        <select class="form-select" id="vm-card-type">
+          <option value="credit"${(p.cardType||'credit')==='credit'?' selected':''}>Credit</option>
+          <option value="debit"${p.cardType==='debit'?' selected':''}>Debit</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Cardholder Name</label>
+        <input class="form-input" id="vm-cardholder" placeholder="John Smith" value="${p.cardHolder||''}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Card Number</label>
+        <input class="form-input" id="vm-cardnum" placeholder="1234 5678 9012 3456" value="${p.cardNum||''}" autocomplete="off" inputmode="numeric" maxlength="23">
+      </div>
+      <div style="display:flex;gap:10px">
+        <div class="form-group" style="flex:1">
+          <label class="form-label">Expiry (MM/YY)</label>
+          <input class="form-input" id="vm-expiry" placeholder="08/28" value="${p.expiry||''}" autocomplete="off" maxlength="5">
+        </div>
+        <div class="form-group" style="flex:1">
+          <label class="form-label">CVV</label>
+          <input class="form-input" id="vm-cvv" placeholder="123" value="${p.cvv||''}" autocomplete="off" inputmode="numeric" maxlength="4">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">PIN (optional)</label>
+        <input class="form-input" id="vm-pin" placeholder="••••" value="${p.pin||''}" autocomplete="off" inputmode="numeric" maxlength="8">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-input" id="vm-notes" rows="2" placeholder="Billing address, rewards info…" style="resize:vertical">${p.notes||''}</textarea>
+      </div>`;
+
+    if(t==='bank') return`
+      <div class="form-group">
+        <label class="form-label">Bank Name *</label>
+        <input class="form-input" id="vm-bankname" placeholder="Chase, Barclays, Wells Fargo…" value="${p.bankName||''}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">App / Website URL</label>
+        <input class="form-input" id="vm-url" placeholder="https://chase.com" value="${p.url||''}" type="url" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Username / Email</label>
+        <input class="form-input" id="vm-user" placeholder="you@email.com" value="${p.user||''}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <div style="position:relative">
+          <input class="form-input" id="vm-pass" type="password" value="${p.pass||''}" autocomplete="new-password" style="padding-right:44px;font-family:monospace">
+          <button type="button" id="vm-vis" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;padding:4px"><span class="ms">visibility</span></button>
+        </div>
+        <div class="vault-strength-row" style="margin-top:6px">${[0,1,2,3].map(i=>`<div class="vault-strength-seg" id="vm-ss${i}"></div>`).join('')}</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Account Number (optional)</label>
+        <input class="form-input" id="vm-accountnum" placeholder="000123456789" value="${p.accountNum||''}" autocomplete="off" inputmode="numeric">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Sort Code / Routing (optional)</label>
+        <input class="form-input" id="vm-routing" placeholder="12-34-56" value="${p.routingNum||''}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-input" id="vm-notes" rows="2" placeholder="Branch, SWIFT, IBAN…" style="resize:vertical">${p.notes||''}</textarea>
+      </div>`;
+
+    if(t==='basic') return`
+      <div class="form-group">
+        <label class="form-label">Label *</label>
+        <input class="form-input" id="vm-label" placeholder="WiFi password, Netflix PIN…" value="${p.label||''}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <div style="position:relative">
+          <input class="form-input" id="vm-pass" type="password" value="${p.pass||''}" autocomplete="new-password" style="padding-right:44px;font-family:monospace">
+          <button type="button" id="vm-vis" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;padding:4px"><span class="ms">visibility</span></button>
+        </div>
+        <div class="vault-strength-row" style="margin-top:6px">${[0,1,2,3].map(i=>`<div class="vault-strength-seg" id="vm-ss${i}"></div>`).join('')}</div>
+      </div>
+      <div class="pass-gen-row">
+        <input type="range" id="vm-gen-len" min="8" max="64" value="${p.pass?p.pass.length:20}" style="flex:1;accent-color:var(--accent)">
+        <span id="vm-gen-len-val" style="font-size:12px;color:var(--text2);min-width:24px;text-align:center">${p.pass?p.pass.length:20}</span>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);cursor:pointer"><input type="checkbox" id="vm-gen-sym" checked style="accent-color:var(--accent)"> Sym</label>
+        <button class="vault-copy-btn" id="vm-gen-btn"><span class="ms">refresh</span> Gen</button>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label class="form-label">Notes (optional)</label>
+        <textarea class="form-input" id="vm-notes" rows="2" placeholder="Hint, context…" style="resize:vertical">${p.notes||''}</textarea>
+      </div>`;
+
+    // default: password
+    const ip=p.pass||initPass;
+    return`
+      <div class="form-group">
+        <label class="form-label">Site / Service *</label>
+        <input class="form-input" id="vm-site" placeholder="google.com" value="${p.site||''}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Label (optional)</label>
+        <input class="form-input" id="vm-label" placeholder="Personal Gmail" value="${p.label||''}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL (optional)</label>
+        <input class="form-input" id="vm-url" placeholder="https://accounts.google.com" value="${p.url||''}" type="url" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Username / Email</label>
+        <input class="form-input" id="vm-user" placeholder="you@email.com" value="${p.user||''}" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password *</label>
+        <div style="position:relative">
+          <input class="form-input" id="vm-pass" type="password" value="${ip}" autocomplete="new-password" style="padding-right:44px;font-family:monospace">
+          <button type="button" id="vm-vis" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;padding:4px"><span class="ms">visibility</span></button>
+        </div>
+        <div class="vault-strength-row" style="margin-top:6px">${[0,1,2,3].map(i=>`<div class="vault-strength-seg" id="vm-ss${i}"></div>`).join('')}</div>
+      </div>
+      <div class="pass-gen-row">
+        <input type="range" id="vm-gen-len" min="8" max="64" value="20" style="flex:1;accent-color:var(--accent)">
+        <span id="vm-gen-len-val" style="font-size:12px;color:var(--text2);min-width:24px;text-align:center">20</span>
+        <label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2);cursor:pointer"><input type="checkbox" id="vm-gen-sym" checked style="accent-color:var(--accent)"> Sym</label>
+        <button class="vault-copy-btn" id="vm-gen-btn"><span class="ms">refresh</span> Gen</button>
+      </div>
+      <div class="form-group" style="margin-top:14px">
+        <label class="form-label">Notes</label>
+        <textarea class="form-input" id="vm-notes" rows="2" placeholder="Security Q, backup codes…" style="resize:vertical">${p.notes||''}</textarea>
+      </div>`;
+  }
+
+  function buildModal(t){
+    openModal(`
+      <div class="modal-head">
+        <button class="ibtn" id="vm-cancel"><span class="ms">close</span></button>
+        <h2>${isEdit?'Edit Entry':'Add Entry'}</h2>
+        <button class="ibtn accent" id="vm-save"><span class="ms">check</span></button>
+      </div>
+      <div class="modal-body" style="padding:16px 18px 24px">
+        <div class="vault-type-chips" id="vm-type-chips">
+          ${['password','bank','card','basic'].map(x=>`
+            <button class="vault-type-chip${t===x?' active':''}" data-vtype="${x}">
+              <span class="ms">${_vaultTypeIcon(x)}</span>${_vaultTypeLabel(x)}
+            </button>`).join('')}
+        </div>
+        <div id="vm-fields">${typeFields(t)}</div>
+      </div>`,
+    'modal modal-sm');
+
+    // type chip switching
+    document.querySelectorAll('[data-vtype]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        currentType=btn.dataset.vtype;
+        // snapshot current values before rebuild
+        _snapshotVmFields(p, currentType==='password'&&p.type!=='password'?'old':p.type);
+        buildModal(currentType);
+      });
+    });
+
+    _bindVmFields(t,p,isEdit);
+  }
+
+  buildModal(currentType);
+}
+
+function _snapshotVmFields(p, prevType){
+  // save whatever is currently in the form before type switch
+  const get=id=>(document.getElementById(id)||{}).value||'';
+  p.notes=get('vm-notes');
+  p.label=get('vm-label');
+  p.url=get('vm-url');
+  p.user=get('vm-user');
+  p.pass=get('vm-pass')||p.pass;
+  p.site=get('vm-site');
+  p.bankName=get('vm-bankname');
+  p.cardHolder=get('vm-cardholder');
+  p.cardNum=get('vm-cardnum');
+  p.expiry=get('vm-expiry');
+  p.cvv=get('vm-cvv');
+  p.pin=get('vm-pin');
+  p.accountNum=get('vm-accountnum');
+  p.routingNum=get('vm-routing');
+  if(document.getElementById('vm-card-type')) p.cardType=document.getElementById('vm-card-type').value;
+}
+
+function _bindVmFields(t,p,isEdit){
+  function updateStrength(){
+    const passEl=document.getElementById('vm-pass');
+    if(!passEl) return;
+    const s=_passStrength(passEl.value);
+    [0,1,2,3].forEach(i=>{
+      const el=document.getElementById('vm-ss'+i);
+      if(el) el.style.background=i<s?_passStrengthColor(s):'var(--surface3)';
+    });
+  }
+  updateStrength();
+  document.getElementById('vm-pass')?.addEventListener('input',updateStrength);
+
+  document.getElementById('vm-vis')?.addEventListener('click',()=>{
+    const inp=document.getElementById('vm-pass');
+    inp.type=inp.type==='password'?'text':'password';
+    document.getElementById('vm-vis').querySelector('.ms').textContent=inp.type==='password'?'visibility':'visibility_off';
+  });
+
+  const lenSlider=document.getElementById('vm-gen-len');
+  const lenVal=document.getElementById('vm-gen-len-val');
+  if(lenSlider){ lenSlider.addEventListener('input',()=>{ lenVal.textContent=lenSlider.value; }); }
+
+  document.getElementById('vm-gen-btn')?.addEventListener('click',()=>{
+    const len=parseInt(lenSlider.value)||20;
+    const sym=document.getElementById('vm-gen-sym').checked;
+    const np=generatePassword(len,sym);
+    const inp=document.getElementById('vm-pass');
+    inp.value=np; inp.type='text';
+    document.getElementById('vm-vis').querySelector('.ms').textContent='visibility_off';
+    updateStrength();
+  });
+
+  // Card number formatting
+  document.getElementById('vm-cardnum')?.addEventListener('input',e=>{
+    let v=e.target.value.replace(/\D/g,'').slice(0,16);
+    e.target.value=v.replace(/(.{4})/g,'$1 ').trim();
+  });
+  // Expiry formatting
+  document.getElementById('vm-expiry')?.addEventListener('input',e=>{
+    let v=e.target.value.replace(/\D/g,'');
+    if(v.length>=2) v=v.slice(0,2)+'/'+v.slice(2,4);
+    e.target.value=v;
+  });
+
+  document.getElementById('vm-cancel').addEventListener('click',closeModal);
+  document.getElementById('vm-save').addEventListener('click',()=>{
+    _snapshotVmFields(p, t);
+    p.type=t;
+
+    // Validation per type
+    if(t==='card'){
+      if(!p.label){ toast('Card label required','error'); return; }
+      p.cardType=document.getElementById('vm-card-type')?.value||'credit';
+    } else if(t==='bank'){
+      if(!p.bankName){ toast('Bank name required','error'); return; }
+      if(!p.pass){ toast('Password required','error'); return; }
+    } else if(t==='basic'){
+      if(!p.label){ toast('Label required','error'); return; }
+      if(!p.pass){ toast('Password required','error'); return; }
+    } else {
+      if(!p.site){ toast('Site required','error'); document.getElementById('vm-site')?.focus(); return; }
+      if(!p.pass){ toast('Password required','error'); return; }
+    }
+
+    p.updatedAt=Date.now();
+    if(!isEdit){
+      p.createdAt=Date.now();
+      if(!S.passwords) S.passwords=[];
+      S.passwords.unshift(p);
+    }
+    saveS();
+    closeModal();
+    renderVault(document.getElementById('vault-search')?.value||'');
+    toast(isEdit?'Entry updated':'Entry saved','success');
+  });
+
+  // Focus first field
+  setTimeout(()=>{
+    const first=document.querySelector('#vm-fields .form-input');
+    if(first) first.focus();
+  },120);
+}
+
+/* ── Open vault view ── */
+function openVault(){
+  _vaultInit();
+  document.getElementById('vault-view').classList.add('open');
+  document.getElementById('vault-fab').classList.add('open');
+  document.getElementById('day-panel').classList.remove('open','expanded');
+  document.getElementById('vault-search').value='';
+  renderVault('');
+  _vaultOpen=true;
+
+  document.getElementById('vault-search').oninput=function(){ renderVault(this.value); };
+  document.getElementById('vault-fab').onclick=()=>openVaultModal();
+  document.getElementById('vault-lock-btn').onclick=()=>{
+    if(!_cryptoKey){ toast('Vault already locked','info'); return; }
+    // Clear key and reload page to full lock state
+    location.reload();
+  };
+}
+
+function closeVault(){
+  document.getElementById('vault-view').classList.remove('open');
+  document.getElementById('vault-fab').classList.remove('open');
+  _vaultOpen=false;
 }
 
 async function init(){
