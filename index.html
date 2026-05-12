@@ -797,13 +797,23 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
 }
 .theme-opt.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 .theme-opt .ms{font-size:20px}
-.accent-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.accent-row{display:flex;gap:8px;flex-wrap:nowrap;align-items:center;justify-content:space-between;width:100%}
 .accent-swatch{
-  width:34px;height:34px;border-radius:50%;cursor:pointer;
-  border:3px solid transparent;transition:var(--tr);
+  width:32px;height:32px;border-radius:50%;cursor:pointer;
+  border:3px solid transparent;transition:var(--tr);flex-shrink:0;
 }
 .accent-swatch.active{border-color:var(--text)!important}
 .accent-swatch:active{transform:scale(1.1)}
+/* Custom color picker swatch */
+.accent-custom{
+  width:32px;height:32px;border-radius:50%;cursor:pointer;flex-shrink:0;
+  background:var(--surface2);border:2px dashed var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;transition:var(--tr);
+}
+.accent-custom:active{border-color:var(--accent);background:var(--accent-soft)}
+.accent-custom .ms{font-size:17px;color:var(--text2);pointer-events:none}
+.accent-custom input[type=color]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
 .slider-row{display:flex;align-items:center;gap:12px}
 .slider-row input[type=range]{
   flex:1;-webkit-appearance:none;height:5px;
@@ -1087,6 +1097,7 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
   .folder-card:hover{border-color:var(--border2);transform:translateY(-2px);box-shadow:0 6px 24px var(--shadow)}
   .item-card:hover{border-color:var(--border2);transform:translateY(-1px)}
   .accent-swatch:hover{transform:scale(1.15)}
+  .accent-custom:hover{border-color:var(--accent);background:var(--accent-soft)}
 }
 .day-num{transition:transform .15s cubic-bezier(.34,1.56,.64,1),background var(--tr)}
 .nav-arrow{transition:var(--tr),transform .15s ease}
@@ -1361,7 +1372,7 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
    STATE & PERSISTENCE
 ═══════════════════════════════════════════════ */
 const FOLDER_COLORS=['#ef4444','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899','#f43f5e'];
-const ACCENT_COLORS=['#6366f1','#a855f7','#3b82f6','#06b6d4','#22c55e','#f97316','#ef4444','#ec4899'];
+const ACCENT_COLORS=['#a855f7','#3b82f6','#06b6d4','#22c55e','#ef4444','#ec4899'];
 const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 
@@ -1997,7 +2008,7 @@ function openFolderModal(existingId, returnFn){
         <div class="color-swatches" id="color-swatches">
           ${swatches}
           <div class="color-swatch color-custom" title="Custom color">
-            <span class="ms">add</span>
+            <span class="ms">colors</span>
             <input type="color" id="folder-custom-color" value="${selColor}">
           </div>
         </div>
@@ -2983,8 +2994,9 @@ function openSettings(){
         <h3>Accent Color</h3>
         <div class="accent-row">
           ${aSwatches}
-          <div class="accent-swatch" style="background:linear-gradient(135deg,#f97316,#ec4899);position:relative;overflow:hidden" title="Custom">
-            <input type="color" id="custom-accent" value="${accent}" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+          <div class="accent-custom" title="Custom color">
+            <span class="ms">colors</span>
+            <input type="color" id="custom-accent" value="${accent}">
           </div>
         </div>
       </div>
