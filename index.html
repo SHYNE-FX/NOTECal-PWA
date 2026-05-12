@@ -560,22 +560,11 @@ nav.header{display:flex;align-items:center;gap:6px;flex-shrink:0}
 
 /* ── FOCUS / DISTRACTION-FREE MODE ───────────── */
 .editor-layout{position:relative}
-.ne-focus-fab{
-  position:absolute;bottom:20px;right:20px;z-index:200;
-  width:52px;height:52px;border-radius:50%;
-  background:var(--accent);
-  box-shadow:0 6px 20px rgba(var(--accent-r),var(--accent-g),var(--accent-b),.45);
-  display:flex;align-items:center;justify-content:center;
-  transition:var(--tr);touch-action:manipulation;
-}
-.ne-focus-fab:active{opacity:.82;transform:scale(.94)}
-.ne-focus-fab svg{width:24px;height:24px;fill:#fff;flex-shrink:0}
 /* Focus-mode buttons inside topbar — hidden by default */
 .ne-focus-action{display:none!important}
 /* When focus mode is ON */
 .editor-layout.focus-mode .fmt-toolbar,
 .editor-layout.focus-mode .editor-options{display:none!important}
-.editor-layout.focus-mode .ne-focus-fab{display:none!important}
 .editor-layout.focus-mode .editor-topbar>*:not(.ne-focus-action){display:none!important}
 .editor-layout.focus-mode .ne-focus-action{
   display:flex!important;align-items:center;justify-content:center;
@@ -1808,36 +1797,6 @@ async function bioUnlock(){
 }
 
 function bioRemove(){ localStorage.removeItem(BIO_STORE); }
-/* ═══════════════════════════════════════════════
-   RATE LIMIT MODULE
-   Thresholds: ≥3 fails → 30s | ≥5 fails → 60s | ≥10 fails → 600s
-   Persisted in localStorage — page refresh cannot bypass.
-   Only passphrase attempts count; biometric cancellations excluded.
-═══════════════════════════════════════════════ */
-const RL_STORE='noical-rl';
-function _rl_get(){try{const r=localStorage.getItem(RL_STORE);return r?JSON.parse(r):{attempts:0,lockedUntil:0};}catch(e){return{attempts:0,lockedUntil:0};}}
-function _rl_set(d){try{localStorage.setItem(RL_STORE,JSON.stringify(d));}catch(e){}}
-function _rl_clear(){try{localStorage.removeItem(RL_STORE);}catch(e){}}
-function _rl_lockDuration(n){if(n>=10)return 600;if(n>=5)return 60;if(n>=3)return 30;return 0;}
-function _rl_check(){
-  const d=_rl_get(),now=Date.now();
-  if(d.lockedUntil&&d.lockedUntil>now)return{locked:true,remaining:Math.ceil((d.lockedUntil-now)/1000),attempts:d.attempts};
-  return{locked:false,attempts:d.attempts};
-}
-function _rl_fail(){
-  const d=_rl_get();
-  d.attempts=(d.attempts||0)+1;
-  const dur=_rl_lockDuration(d.attempts);
-  if(dur>0)d.lockedUntil=Date.now()+dur*1000;
-  _rl_set(d);
-  return{attempts:d.attempts,dur,lockedUntil:d.lockedUntil||0};
-}
-function _rl_success(){_rl_clear();}
-function _rl_attemptsLabel(n){
-  const next=n>=10?null:n>=5?10:n>=3?5:3;
-  const nextDur=next?_rl_lockDuration(next):null;
-  return next?`Attempt ${n} — ${next-n} wrong answer${next-n===1?'':'s'} until ${nextDur}s lockout`:`Attempt ${n}`;
-}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function dateStr(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`}
 function today(){const n=new Date();return dateStr(n.getFullYear(),n.getMonth(),n.getDate())}
@@ -2301,6 +2260,8 @@ function openNoteEditor(id){
           <option value="image">Image</option>
           <option value="pdf">PDF</option>
         </select>
+        <div class="fmt-sep"></div>
+        <button class="fmt-btn" id="ne-focus-fab" title="Focus mode"><span class="ms">fullscreen</span></button>
       </div>
       <div class="editor-options">
         <select class="font-note-select" id="ne-font-sel" style="font-size:11px;padding:4px 24px 4px 8px;min-height:32px">
@@ -2326,12 +2287,7 @@ function openNoteEditor(id){
         <div id="ne-pin-marker-slot"></div>
         <div class="note-area note-bg-${bg}" id="ne-content" contenteditable="true" spellcheck="true">${note?note.content:''}</div>
       </div>
-      <!-- Distraction-free FAB -->
-      <button class="ne-focus-fab" id="ne-focus-fab" title="Focus mode">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
-        </svg>
-      </button>
+
     </div>`,
   'modal modal-full');
 
@@ -2510,7 +2466,8 @@ function openNoteEditor(id){
   document.getElementById('ne-focus-fab').addEventListener('click',()=>{
     _focusSnapshot=area.innerHTML;
     _focusLayout.classList.add('focus-mode');
-    area.focus();
+    // Do NOT call area.focus() — keep keyboard hidden until user taps the editor
+    area.blur();
   });
   document.getElementById('ne-focus-cancel').addEventListener('click',()=>{
     area.innerHTML=_focusSnapshot;
@@ -2538,7 +2495,7 @@ function openNoteEditor(id){
     }
     saveS();renderDayPanel();renderCalendar();toast('Note saved','success');
     _focusLayout.classList.remove('focus-mode');
-    area.focus();
+    // Don't auto-focus — let user tap to resume typing
   });
 
   function saveNote(){
@@ -3711,8 +3668,8 @@ function showEncLockScreen(mode, onDone){
         bioSection.style.display='flex';
         bioLabel.textContent='Unlock with Biometrics';
 
-        // Auto-trigger biometric on unlock (skip if rate-limited)
-        if(!_rl_check().locked) setTimeout(()=>_doBioUnlock(), 300);
+        // Auto-trigger biometric on unlock
+        setTimeout(()=>_doBioUnlock(), 300);
       }
     } else if(mode==='setup'){
       title.textContent='Encrypt Your Vault';
@@ -3798,48 +3755,22 @@ function showEncLockScreen(mode, onDone){
       if(!pass){ _encStatus('Passphrase required','err'); input.focus(); return; }
 
       if(mode==='unlock'){
-        // Rate limit gate
-        const _rlNow=_rl_check();
-        if(_rlNow.locked){
-          _encStatus(`Vault locked. Try again in ${_rlNow.remaining}s`,'err');
-          return;
-        }
         _encIconState('pulse');
         _encStatus('Decrypting…');
         submitBtn.disabled=true;
         try{
           await decryptVault(pass);
-          _rl_success();
+          // Cache passphrase in session
           _cachePass(pass);
           _encIconState('default');
           _encStatus('Decrypted!','ok');
           setTimeout(()=>done(true),350);
         }catch(e){
-          const _rlR=_rl_fail();
-          const _rlDur=_rl_lockDuration(_rlR.attempts);
-          if(_rlDur>0){
-            _encIconState('error');
-            input.value='';
-            input.disabled=true;
-            submitBtn.disabled=true;
-            let _rlSec=_rlDur;
-            const _rlTick=()=>{
-              _encStatus(`Too many attempts — locked for ${_rlSec}s`,'err');
-              if(_rlSec>0){_rlSec--;setTimeout(_rlTick,1000);}
-              else{
-                input.disabled=false;submitBtn.disabled=false;
-                _encIconState('default');_encStatus('');input.value='';input.focus();
-              }
-            };
-            _rlTick();
-          }else{
-            _encIconState('error');
-            const _rlLbl=_rl_attemptsLabel(_rlR.attempts);
-            _encStatus(`Wrong passphrase. ${_rlLbl}`,'err');
-            input.value='';
-            input.focus();
-            submitBtn.disabled=false;
-          }
+          _encIconState('error');
+          _encStatus('Wrong passphrase. Try again.','err');
+          input.value='';
+          input.focus();
+          submitBtn.disabled=false;
         }
       } else {
         // setup / migrate / change
@@ -3878,27 +3809,6 @@ function showEncLockScreen(mode, onDone){
 
     if(skipBtn){ skipBtn.onclick=()=>done(false); }
 
-    // Apply lockout UI immediately if a lockout is already active (persisted from previous session)
-    if(mode==='unlock'){
-      const _rlInit=_rl_check();
-      if(_rlInit.locked){
-        input.disabled=true;
-        submitBtn.disabled=true;
-        _encIconState('error');
-        let _rlSec=_rlInit.remaining;
-        const _rlInitTick=()=>{
-          _encStatus(`Too many attempts — locked for ${_rlSec}s`,'err');
-          if(_rlSec>0){_rlSec--;setTimeout(_rlInitTick,1000);}
-          else{
-            input.disabled=false;submitBtn.disabled=false;
-            _encIconState('default');_encStatus('');input.value='';
-            setTimeout(()=>input.focus(),50);
-          }
-        };
-        _rlInitTick();
-        return; // skip normal focus
-      }
-    }
     setTimeout(()=>{ if(passForm.style.display!=='none') input.focus(); }, 100);
   });
 }
