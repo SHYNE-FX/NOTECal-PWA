@@ -2238,7 +2238,11 @@ function openNoteEditor(id){
         </button>
         <!-- /focus-mode controls -->
         <select class="form-select ne-folder-inline" id="ne-folder">${folderSelect(note?note.folderId:S.folders[0]?.id)}</select>
-        <button class="ibtn ne-sq ne-clear-sq" id="ne-clear" title="Clear"><span class="ms">backspace</span></button>
+        <button class="ibtn ne-sq ne-clear-sq" id="ne-clear" title="Clear">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 -960 960 960" fill="currentColor">
+            <path d="M720-40q-59 0-106-30.5T542-149q-6-11-1.5-22.65 4.5-11.64 15.5-16.5 11-4.85 23-.85 12 4 18 15 17 33 49.5 53.5T720-100q58 0 99-41t41-99q0-58-41-99t-99-41q-29 0-54 10.5T622-340h28q13 0 21.5 8.5T680-310q0 13-8.5 21.5T650-280H550q-12.75 0-21.37-8.63Q520-297.25 520-310v-100q0-13 8.5-21.5T550-440q13 0 21.5 8.5T580-410v27q27-26 63-41.5t77-15.5q83 0 141.5 58.5T920-240q0 83-58.5 141.5T720-40ZM180-180v-600 600Zm130-440h340q12.75 0 21.38-8.68 8.62-8.67 8.62-21.5 0-12.82-8.62-21.32-8.63-8.5-21.38-8.5H310q-12.75 0-21.37 8.68-8.63 8.67-8.63 21.5 0 12.82 8.63 21.32 8.62 8.5 21.37 8.5Zm0 170h186q12.75 0 21.38-8.68 8.62-8.67 8.62-21.5 0-12.82-8.62-21.32-8.63-8.5-21.38-8.5H310q-12.75 0-21.37 8.68-8.63 8.67-8.63 21.5 0 12.82 8.63 21.32 8.62 8.5 21.37 8.5Zm0 170h111q12.75 0 21.38-8.68 8.62-8.67 8.62-21.5 0-12.82-8.62-21.32-8.63-8.5-21.38-8.5H310q-12.75 0-21.37 8.68-8.63 8.67-8.63 21.5 0 12.82 8.63 21.32 8.62 8.5 21.37 8.5ZM180-120q-24.75 0-42.37-17.63Q120-155.25 120-180v-600q0-24.75 17.63-42.38Q155.25-840 180-840h600q24.75 0 42.38 17.62Q840-804.75 840-780v214q0 12.75-8.68 21.37-8.67 8.63-21.5 8.63-12.82 0-21.32-8.63-8.5-8.62-8.5-21.37v-214H180v600h214q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5H180Z"/>
+          </svg>
+        </button>
         <button class="ibtn ne-sq ne-save-sq" id="ne-save" title="Save"><span class="ms">check</span></button>
       </div>
       <div class="fmt-toolbar">
@@ -2275,9 +2279,8 @@ function openNoteEditor(id){
         </select>
         <input type="color" id="ne-bg-color" title="Sheet color" value="${note&&note.bgColor?note.bgColor:'#faf8f4'}" style="width:28px;height:28px;border-radius:6px;border:2px solid var(--border2);cursor:pointer;padding:0;flex-shrink:0">
         <button class="fmt-btn${curPinned?' active':''}" id="ne-pin" title="Pin date/time to note" style="width:28px;height:28px;flex-shrink:0">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="11" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M12 7v10M8.5 10.5l3.5-3.5 3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 -960 960 960" fill="currentColor">
+            <path d="M180-80q-24 0-42-18t-18-42v-620q0-24 18-42t42-18h65v-28q0-13.6 9.48-22.8 9.48-9.2 23.5-9.2t23.02 9.2q9 9.2 9 22.8v28h340v-28q0-13.6 9.48-22.8 9.48-9.2 23.5-9.2t23.02 9.2q9 9.2 9 22.8v28h65q24 0 42 18t18 42v277q0 12.75-8.68 21.37-8.67 8.63-21.5 8.63-12.82 0-21.32-8.63-8.5-8.62-8.5-21.37v-87H180v430h306q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32Q498.75-80 486-80H180Zm417.5-15.5Q542-151 542-229t55.5-133.5Q653-418 731-418t133.5 55.5Q920-307 920-229T864.5-95.5Q809-40 731-40T597.5-95.5ZM742-231v-92.92q0-8.08-5.5-13.58T723-343q-8 0-14 5.7t-6 13.3v95q0 5.57 2 10.78 2 5.22 6 10.22l64 66q6 6 14 6t14-6q6-6 6-14t-6-14l-61-61Z"/>
           </svg>
         </button>
         <input type="file" id="ne-bg-file" accept="image/*" style="display:none">
